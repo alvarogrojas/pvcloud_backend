@@ -19,31 +19,12 @@ require_once './DA/da_account.php';
 
 $email = filter_input(INPUT_GET, "email");
 $nickname = filter_input(INPUT_GET, "nickname");
-$pwdHash = filter_input(INPUT_GET, "pwdHash");
-
-
+$pwdHash = sha1(filter_input(INPUT_GET, "pwd"));
 
 $response = new newAccountResponse();
-try {
-    $newAccount = da_account::AddNewAccount($email, $nickname, $pwdHash);
 
-    if ($newAccount != NULL && $newAccount->email == $email) {
-        $response->status = "OK";
-        $response->message = "Account for $newAccount->email was created successfully.";
-    } else {
-        $response->status = "ERROR";
-        $response->message = "Adding new account failed";
-    }
-} catch (Exception $ex) {
-    $response->status = "ERROR";
-    $response->message = $ex->getMessage();
-}
+$response = addNewAccount($email, $nickname, $pwdHash);
 
-try {
-    sendNewAccountEmail($newAccount->email, $newAccount->confirmation_guid);
-} catch (Exception $ex) {
-    
-}
 header('Content-Type: application/json');
 echo json_encode($response);
 
@@ -53,8 +34,40 @@ function sendNewAccountEmail($email, $guid) {
     $to = $email;
     $subject = "Confirmación de cuenta PV Cloud";
     $headers = 'From: donotreply@costaricamakers.com' . "\r\n";
-    
-    
+
+
     $result = mail($to, $subject, $message, $headers);
-        print_r($result);
+}
+
+function addNewAccount($email, $nickname, $pwdHash) {
+    try {
+        $existingAccount = da_account::GetAccount($email);
+
+        if ($existingAccount->email == $email) {
+            $response->status = "ERROR";
+            $response->message = "Ya existe una cuenta de pvCloud para esa direccion de email ($email)";
+        } else {
+
+            $newAccount = da_account::AddNewAccount($email, $nickname, $pwdHash);
+
+            if ($newAccount != NULL && $newAccount->email == $email) {
+                $response->status = "OK";
+                $response->message = "Account for $newAccount->email was created successfully.";
+            } else {
+                $response->status = "EXCEPTION";
+                $response->message = "Adding new account failed";
+            }
+        }
+    } catch (Exception $ex) {
+        $response->status = "EXCEPTION";
+        $response->message = $ex->getMessage();
+    }
+
+    try {
+        sendNewAccountEmail($newAccount->email, $newAccount->confirmation_guid);
+    } catch (Exception $ex) {
+        
+    }
+    
+    return $response;
 }
