@@ -18,6 +18,11 @@ require_once './DA/da_helper.php';
 require_once './DA/da_account.php';
 require_once './DA/da_session.php';
 
+/**
+ * Validates email + token provcided in query string and returns simpleResponse object with status (OK, ERROR, EXCEPTION) and a message
+ * 
+ * @return \simpleResponse
+ */
 function validate() {
     $email = filter_input(INPUT_GET, "email");
     $token = filter_input(INPUT_GET, "token");
@@ -26,8 +31,8 @@ function validate() {
 
     try {
         $session = da_session::GetAndValidateSession($email, $token);
-
-        if ($session->email == $email && $session->token == $token) {
+        
+        if ($session->email == $email && $session->token == $token && $session->email != "") {
             $response->status = "OK";
             $response->message = "Sesión válida";
         } else {
