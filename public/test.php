@@ -16,9 +16,9 @@ require_once './DA/da_devices_registry.php';
         <?php
         ReportInfo("Initiating Tests!");
 
-        test_da_session();
-        test_da_device();
+        TEST_DASession::test_da_session();
 
+        TEST_DADevice::test_da_device();
 
         ReportInfo("Tests Finished!");
         ?> 
@@ -27,52 +27,68 @@ require_once './DA/da_devices_registry.php';
 
 <?php
 
-function test_da_device() {
-    $testName = "DA DEVICE TEST";
-    ReportInfo("Initiating $testName");
+class TEST_DADevice {
 
-    $newDevice = new be_device();
-    $newDevice->account_id = 1;
-    $newDevice->device_nickname = "JN GALILEO1";
-    $newDevice->device_description = "";
+    public static function test_da_device() {
+        $testName = "DA DEVICE TEST";
+        ReportInfo("Initiating $testName");
 
-    ReportInfo("Device to Create:");
-    print_r($newDevice);
+        TEST_DADevice::testDeviceCreation();
 
-    $registeredDevice = da_devices_registry::RegisterNewDevice($newDevice);
-    ReportInfo("Device Created:");
-    print_r($registeredDevice);
+        TEST_DADevice::testDeviceListRetrieval();
 
-    if ($registeredDevice->device_id > 0) {
-        ReportSuccess("Created Device seems to be OK!");
-    } else {
-        ReportError("Created device seems to be WRONG! :(");
+        ReportInfo("Complete: $testName");
     }
 
-    ReportInfo("Testing retrieval of a list of devices for an account...");
-    $account_id = 1;
-    $devices = da_devices_registry::GetListOfDevices($account_id);
-    print_r($devices);
-    if (count($devices)>0){
-        ReportSuccess("Result seems to be fine.");
-    } else {
-        ReportSuccess("Result seems to be WRONG");
+    private static function testDeviceCreation() {
+        $newDevice = new be_device();
+        $newDevice->account_id = 1;
+        $newDevice->device_nickname = "JN GALILEO1";
+        $newDevice->device_description = "";
+
+        ReportInfo("Device to Create:");
+        print_r($newDevice);
+
+        $registeredDevice = da_devices_registry::RegisterNewDevice($newDevice);
+        ReportInfo("Device Created:");
+        print_r($registeredDevice);
+
+        if ($registeredDevice->device_id > 0) {
+            ReportSuccess("Created Device seems to be OK!");
+        } else {
+            ReportError("Created device seems to be WRONG! :(");
+        }
+
+        return $registeredDevice;
     }
-    
-    ReportInfo("Complete: $testName");
+
+    private static function testDeviceListRetrieval() {
+        ReportInfo("Testing retrieval of a list of devices for an account...");
+        $account_id = 1;
+        $devices = da_devices_registry::GetListOfDevices($account_id);
+        print_r($devices);
+        if (count($devices) > 0) {
+            ReportSuccess("Result seems to be fine.");
+        } else {
+            ReportSuccess("Result seems to be WRONG");
+        }
+    }
+
 }
 
-function test_da_session() {
-    ReportInfo("Initiating Session Test");
-    ReportInfo("creating session on jose.a.nunez@gmail.com");
-    $session = da_session::CreateSession("jose.a.nunez@gmail.com");
-    print_r($session);
-    if ($session->token != '') {
-        ReportSuccess("Session seems to be Correct!");
-    } else {
-        ReportError("Session seems to be BAD");
+class TEST_DASession {
+    public static function test_da_session() {
+        ReportInfo("Initiating Session Test");
+        ReportInfo("creating session on jose.a.nunez@gmail.com");
+        $session = da_session::CreateSession("jose.a.nunez@gmail.com");
+        print_r($session);
+        if ($session->token != '') {
+            ReportSuccess("Session seems to be Correct!");
+        } else {
+            ReportError("Session seems to be BAD");
+        }
+        ReportInfo("Session Tests Complete!");
     }
-    ReportInfo("Session Tests Complete!");
 }
 
 function test_da_account() {
