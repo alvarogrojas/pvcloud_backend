@@ -28,16 +28,22 @@ require_once './DA/da_devices_registry.php';
 function execute() {
     $response = new simpleResponse();
     try {
-        $account_id = 0;
+
         include './inc/incWebServiceSessionValidation.php';
-        
-        if ($account_id > 0) {
-            $devices = da_devices_registry::GetListOfDevices($account_id);
+
+        $deviceToModify = new be_device();
+        $deviceToModify->account_id = filter_input(INPUT_GET, "account_id");
+        $deviceToModify->device_nickname = filter_input(INPUT_GET, "device_nickname");
+        $deviceToModify->device_description = filter_input(INPUT_GET, "device_description");
+
+        if ($deviceToModify->account_id > 0 && $deviceToModify->device_nickname != "" && $deviceToModify->device_description != "") {
+            $modifiedDevice = da_devices_registry::UpdateDevice($deviceToModify);
             $response->status = "OK";
             $response->message = "SUCCESS";
-            $response->data = $devices;
+            $response->data = $modifiedDevice;
         } else {
             $response->status = "ERROR";
+            $response->message = "Parámetros Inválidos";
         }
     } catch (Exception $ex) {
         $response->status = "EXCEPTION";

@@ -25,8 +25,7 @@ $response = new newAccountResponse();
 
 $response = addNewAccount($email, $nickname, $pwdHash);
 
-header("Access-Control-Allow-Origin: http://localhost:9000");
-header('Content-Type: application/json');
+include './inc/incJSONHeaders.php';
 echo json_encode($response);
 
 function sendNewAccountEmail($email, $guid) {

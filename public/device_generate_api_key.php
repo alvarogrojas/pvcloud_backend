@@ -28,16 +28,19 @@ require_once './DA/da_devices_registry.php';
 function execute() {
     $response = new simpleResponse();
     try {
-        $account_id = 0;
+
         include './inc/incWebServiceSessionValidation.php';
-        
-        if ($account_id > 0) {
-            $devices = da_devices_registry::GetListOfDevices($account_id);
+
+        $device_id = filter_input(INPUT_GET, "device_id");
+
+        if ($device_id > 0) {
+            $modifiedDevice = da_devices_registry::RegenerateApiKey($device_id);
             $response->status = "OK";
             $response->message = "SUCCESS";
-            $response->data = $devices;
+            $response->data = $modifiedDevice;
         } else {
             $response->status = "ERROR";
+            $response->message = "Parámetros Inválidos";
         }
     } catch (Exception $ex) {
         $response->status = "EXCEPTION";

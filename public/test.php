@@ -32,8 +32,16 @@ class TEST_DADevice {
         $testName = "DA DEVICE TEST";
         ReportInfo("Initiating $testName");
 
-        TEST_DADevice::testDeviceCreation();
-
+        $createdDevice = TEST_DADevice::testDeviceCreation();
+        
+        TEST_DADevice::testDeviceListRetrieval();
+        
+        $modifiedDevice = TEST_DADevice::testDeviceModification($createdDevice);
+        
+        $apiGenerationDevice = TEST_DADevice::testAPIKeyRegeneration($modifiedDevice);
+        
+        $deletedDevice = TEST_DADevice::testDeviceDeletion($apiGenerationDevice);
+        
         TEST_DADevice::testDeviceListRetrieval();
 
         ReportInfo("Complete: $testName");
@@ -73,9 +81,92 @@ class TEST_DADevice {
         }
     }
 
+    /**
+     * 
+     * @param be_device $deviceToModify
+     * @return be_device
+     */
+    private static function testDeviceModification($deviceToModify) {
+
+        ReportInfo("Device to Modify:");
+        print_r($deviceToModify);
+
+        $deviceToModify->device_nickname = "JN_GALILEO_MODIFIED";
+        $deviceToModify->device_description = "Modified Galielo Entry";
+
+        $modifiedDevice = da_devices_registry::UpdateDevice($deviceToModify);
+
+        if ($modifiedDevice->device_nickname == $deviceToModify->device_nickname && $modifiedDevice->device_description == $deviceToModify->device_description) {
+            ReportSuccess("Device Seems to be properly modified");
+        } else {
+            ReportError("Device Modification seemed to fail!");
+        }
+
+        $deviceToModify->device_nickname = "JN GALILEO MODIFIED 2";
+        ReportInfo("Second Modification:");
+        print_r($deviceToModify);
+
+        $modifiedDevice = da_devices_registry::UpdateDevice($deviceToModify);
+
+        if ($modifiedDevice->device_nickname == $deviceToModify->device_nickname && $modifiedDevice->device_description == $deviceToModify->device_description) {
+            ReportSuccess("Device Seems to be properly modified");
+        } else {
+            ReportError("Device Modification seemed to fail!");
+        }
+
+        return $modifiedDevice;
+    }
+
+    /**
+     * 
+     * @param be_device $deviceToModify
+     * @return be_device
+     */
+    private static function testAPIKeyRegeneration($deviceToModify) {
+        ReportInfo("Device to Generate API KEY for:");
+        print_r($deviceToModify);
+
+        $modifiedDevice = da_devices_registry::RegenerateApiKey($deviceToModify->device_id);
+
+        ReportInfo("Device with new API KEY:");
+        print_r($modifiedDevice);
+        
+        if ($modifiedDevice->api_key!="" && $modifiedDevice->api_key != $deviceToModify->api_key) {
+            ReportSuccess("API KEY properly modified");
+        } else {
+            ReportError("API KEY GENERQATION seemed to fail!");
+        }
+
+        return $modifiedDevice;
+    }
+
+    /**
+     * 
+     * @param be_device $deviceToDelete
+     * @return be_device
+     */
+    private static function testDeviceDeletion($deviceToDelete) {
+        ReportInfo("Device to DELETE:");
+        print_r($deviceToDelete);
+
+        $deletedDevice = da_devices_registry::DeleteDevice($deviceToDelete->device_id);
+
+        ReportInfo("RESULT:");
+        print_r($deletedDevice);
+        
+        if ($deletedDevice->deleted_datetime != NULL) {
+            ReportSuccess("API KEY properly modified");
+        } else {
+            ReportError("API KEY GENERQATION seemed to fail!");
+        }
+
+        return $deletedDevice;        
+    }
+
 }
 
 class TEST_DASession {
+
     public static function test_da_session() {
         ReportInfo("Initiating Session Test");
         ReportInfo("creating session on jose.a.nunez@gmail.com");
@@ -88,6 +179,7 @@ class TEST_DASession {
         }
         ReportInfo("Session Tests Complete!");
     }
+
 }
 
 function test_da_account() {
