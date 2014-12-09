@@ -28,20 +28,25 @@ require_once './DA/da_devices_registry.php';
 function execute() {
     $response = new simpleResponse();
     try {
-        $account_id = filter_input(INPUT_GET, "account_id");
+        $deviceToRegister = new be_device();
+        $deviceToRegister->account_id = filter_input(INPUT_GET, "account_id");
+        $deviceToRegister->device_nickname = filter_input(INPUT_GET, "device_nickname");
+        $deviceToRegister->device_description = filter_input(INPUT_GET, "device_description");
         $token = filter_input(INPUT_GET, "token");
-        
-        $session = da_session::GetAndValidateSession($account_id, $token);
-        
-        if($session==NULL) die("Invalid Session");
-        
-        if ($account_id > 0) {
-            $devices = da_devices_registry::GetListOfDevices($account_id);
-            $response->status = "OK";
-            $response->message = "SUCCESS";
-            $response->data = $devices;
+
+        if ($deviceToRegister->account_id > 0) {
+            if ($deviceToRegister->device_nickname != "") {
+                $device = da_devices_registry::RegisterNewDevice($deviceToRegister);
+                $response->status = "OK";
+                $response->message = "SUCCESS";
+                $response->data = $device;
+            } else {
+                $response->status = "ERROR";
+                $response->message = "Parámetro Inválido: Nombre de Dispositivo";
+            }
         } else {
             $response->status = "ERROR";
+            $response->message = "Parámetro Inválido: Cuenta de Usuario";
         }
     } catch (Exception $ex) {
         $response->status = "EXCEPTION";

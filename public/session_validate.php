@@ -24,20 +24,28 @@ require_once './DA/da_session.php';
  * @return \simpleResponse
  */
 function validate() {
-    $email = filter_input(INPUT_GET, "email");
+    $response = new simpleResponse();
+    $account_id = filter_input(INPUT_GET, "account_id");
     $token = filter_input(INPUT_GET, "token");
 
-    $response = new simpleResponse();
+
+
 
     try {
-        $session = da_session::GetAndValidateSession($email, $token);
-        
-        if ($session->email == $email && $session->token == $token && $session->email != "") {
-            $response->status = "OK";
-            $response->message = "Sesión válida";
-        } else {
+
+        if ($account_id == 0 || $account_id == "" || $account_id == NULL || $token == "" || $token == NULL) {
             $response->status = "ERROR";
             $response->message = "La sesión no es válida. Por favor autentíquese nuevamente";
+        } else {
+            $session = da_session::GetAndValidateSession($account_id, $token);
+
+            if ($session->account_id == $account_id && $session->token == $token) {
+                $response->status = "OK";
+                $response->message = "Sesión válida";
+            } else {
+                $response->status = "ERROR";
+                $response->message = "La sesión no es válida. Por favor autentíquese nuevamente";
+            }
         }
     } catch (Exception $ex) {
         $response->status = "EXCEPTION";
@@ -47,5 +55,6 @@ function validate() {
     return $response;
 }
 
+header("Access-Control-Allow-Origin: http://localhost:9000");
 header('Content-Type: application/json');
 echo json_encode(validate());

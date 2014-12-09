@@ -7,6 +7,7 @@
  */
 class be_account {
 
+    public $account_id = 0;
     public $email = "";
     public $nickname = "";
     public $pwd_hash = "";
@@ -98,7 +99,7 @@ class da_account {
     }
 
     public static function GetAccount($email) {
-        $sqlCommand = "SELECT email,nickname,pwd_hash, confirmed, confirmation_guid, created_datetime, modified_datetime, deleted_datetime"
+        $sqlCommand = "SELECT account_id,email,nickname,pwd_hash, confirmed, confirmation_guid, created_datetime, modified_datetime, deleted_datetime"
                 . " FROM accounts "
                 . " WHERE email=? ";
 
@@ -124,7 +125,7 @@ class da_account {
         }
 
         $result = new be_account();
-        $stmt->bind_result($result->email, $result->nickname, $result->pwd_hash, $result->confirmed, $result->confirmation_guid, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime);
+        $stmt->bind_result($result->account_id, $result->email, $result->nickname, $result->pwd_hash, $result->confirmed, $result->confirmation_guid, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime);
 
         if (!$stmt->fetch()) {
             $result = NULL;

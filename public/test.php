@@ -5,7 +5,6 @@ require_once './DA/da_account.php';
 require_once './DA/da_session.php';
 require_once './DA/da_devices_registry.php';
 ?>
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -80,7 +79,7 @@ class TEST_DASession {
     public static function test_da_session() {
         ReportInfo("Initiating Session Test");
         ReportInfo("creating session on jose.a.nunez@gmail.com");
-        $session = da_session::CreateSession("jose.a.nunez@gmail.com");
+        $session = da_session::CreateSession(1);
         print_r($session);
         if ($session->token != '') {
             ReportSuccess("Session seems to be Correct!");

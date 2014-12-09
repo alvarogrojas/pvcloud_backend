@@ -8,8 +8,9 @@ error_reporting(E_ERROR);
 
 class simpleResponse {
 
-    public $status = "";
+    public $status = ""; /*OK, ERROR, EXCEPTION*/
     public $message = "";
+    public $data = NULL;
 
 }
 
@@ -28,10 +29,10 @@ function authenticate() {
         $pwdHash = sha1($pwd);
 
         if ($pwdHash == $activatedAccount->pwd_hash) {
-            $newSession = da_session::CreateSession($email);
-            if ($newSession->email == $email) {
+            $newSession = da_session::CreateSession($activatedAccount->account_id);
+            if ($newSession->account_id > 0 && $newSession->token != "" && $newSession != NULL) {
                 $response->status = "OK";
-                $response->message = $newSession->token;
+                $response->data = $newSession;
             }
         } else {
             $response->status = "ERROR";
@@ -44,6 +45,6 @@ function authenticate() {
 
     return $response;
 }
-
+header("Access-Control-Allow-Origin: http://localhost:9000");
 header('Content-Type: application/json');
 echo json_encode(authenticate());
