@@ -1,6 +1,6 @@
 <?php
 
-//TEST: http://localhost:8080/pvcloud_backend/vse_get_value_last.php?account_id=1&device_id=1&api_key=5eed4949398c5905578c8f17825e5316a4bec52b&optional_label=DIRECT+TEST
+//TEST: http://localhost:8080/pvcloud_backend/vse_clear_values.php?account_id=1&device_id=1&api_key=5eed4949398c5905578c8f17825e5316a4bec52b&optional_label=DIRECT+TEST
 error_reporting(E_ERROR);
 
 require_once './DA/da_conf.php';
@@ -23,7 +23,7 @@ function execute() {
         $parameters = collectParameters();
 
         if (validate($parameters)) {
-            $entries = da_vse_data::GetLastEntry($parameters->device_id, $parameters->optional_vse_label);
+            $entries = da_vse_data::ClearEntries($parameters->device_id, $parameters->optional_vse_label);
         } else {
             die("Parámetros Inválidos");
         }
