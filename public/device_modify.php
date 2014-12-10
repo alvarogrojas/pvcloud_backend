@@ -31,11 +31,13 @@ function execute() {
 
         include './inc/incWebServiceSessionValidation.php';
 
-        $deviceToModify = new be_device();
+        $device_id = filter_input(INPUT_GET, "device_id");
+        
+        $deviceToModify = da_devices_registry::GetDevice($device_id);
         $deviceToModify->account_id = filter_input(INPUT_GET, "account_id");
         $deviceToModify->device_nickname = filter_input(INPUT_GET, "device_nickname");
         $deviceToModify->device_description = filter_input(INPUT_GET, "device_description");
-
+        
         if ($deviceToModify->account_id > 0 && $deviceToModify->device_nickname != "" && $deviceToModify->device_description != "") {
             $modifiedDevice = da_devices_registry::UpdateDevice($deviceToModify);
             $response->status = "OK";
@@ -43,7 +45,9 @@ function execute() {
             $response->data = $modifiedDevice;
         } else {
             $response->status = "ERROR";
-            $response->message = "Parámetros Inválidos";
+            if(! $deviceToModify->account_id>0) $response->message = "Parámetros Inválidos - AccountID";
+            if($deviceToModify->device_nickname == "") $response->message = "Parámetros Inválidos - Nickname";
+            if($deviceToModify->device_description == "") $response->message = "Parámetros Inválidos - Description";
         }
     } catch (Exception $ex) {
         $response->status = "EXCEPTION";

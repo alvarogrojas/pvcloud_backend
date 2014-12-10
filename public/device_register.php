@@ -28,14 +28,16 @@ require_once './DA/da_devices_registry.php';
 function execute() {
     $response = new simpleResponse();
     try {
+        $account_id = 0; $token = 0;
+        include './inc/incWebServiceSessionValidation.php';
+        
         $deviceToRegister = new be_device();
-        $deviceToRegister->account_id = filter_input(INPUT_GET, "account_id");
+        $deviceToRegister->account_id = $account_id;
         $deviceToRegister->device_nickname = filter_input(INPUT_GET, "device_nickname");
         $deviceToRegister->device_description = filter_input(INPUT_GET, "device_description");
-        $token = filter_input(INPUT_GET, "token");
 
         if ($deviceToRegister->account_id > 0) {
-            if ($deviceToRegister->device_nickname != "") {
+            if ($deviceToRegister->device_nickname !== "") {
                 $device = da_devices_registry::RegisterNewDevice($deviceToRegister);
                 $response->status = "OK";
                 $response->message = "SUCCESS";

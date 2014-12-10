@@ -31,13 +31,10 @@ function execute() {
 
         include './inc/incWebServiceSessionValidation.php';
 
-        $deviceToModify = new be_device();
-        $deviceToModify->account_id = filter_input(INPUT_GET, "account_id");
-        $deviceToModify->device_nickname = filter_input(INPUT_GET, "device_nickname");
-        $deviceToModify->device_description = filter_input(INPUT_GET, "device_description");
+        $device_id = filter_input(INPUT_GET, "device_id");
 
-        if ($deviceToModify->account_id > 0 && $deviceToModify->device_nickname != "" && $deviceToModify->device_description != "") {
-            $modifiedDevice = da_devices_registry::UpdateDevice($deviceToModify);
+        if ($device_id > 0) {
+            $modifiedDevice = da_devices_registry::DeleteDevice($device_id);
             $response->status = "OK";
             $response->message = "SUCCESS";
             $response->data = $modifiedDevice;
