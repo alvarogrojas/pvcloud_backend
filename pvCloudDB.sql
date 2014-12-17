@@ -3,18 +3,17 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 06, 2014 at 11:05 PM
+-- Generation Time: Dec 17, 2014 at 07:22 AM
 -- Server version: 5.6.16
 -- PHP Version: 5.5.11
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
 -- Database: `pvcloud`
 --
 CREATE DATABASE IF NOT EXISTS `pvcloud` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-USE `pvcloud`;
+USE pvcloud;
 
 -- --------------------------------------------------------
 
@@ -39,6 +38,11 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='PV Cloud User Accounts' AUTO_INCREMENT=2 ;
 
 --
+-- Truncate table before insert `accounts`
+--
+
+TRUNCATE TABLE `accounts`;
+--
 -- Dumping data for table `accounts`
 --
 
@@ -56,7 +60,8 @@ CREATE TABLE IF NOT EXISTS `device_registry` (
   `device_id` int(11) NOT NULL AUTO_INCREMENT,
   `account_id` int(11) NOT NULL,
   `device_nickname` varchar(50) COLLATE utf8_bin NOT NULL,
-  `description` varchar(1000) COLLATE utf8_bin NOT NULL,
+  `device_description` varchar(1000) COLLATE utf8_bin NOT NULL,
+  `api_key` varchar(200) COLLATE utf8_bin NOT NULL,
   `created_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_datetime` datetime DEFAULT NULL,
@@ -64,14 +69,21 @@ CREATE TABLE IF NOT EXISTS `device_registry` (
   PRIMARY KEY (`device_id`),
   KEY `device_nickname` (`device_nickname`),
   KEY `account_id` (`account_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=4 ;
 
+--
+-- Truncate table before insert `device_registry`
+--
+
+TRUNCATE TABLE `device_registry`;
 --
 -- Dumping data for table `device_registry`
 --
 
-INSERT INTO `device_registry` (`device_id`, `account_id`, `device_nickname`, `description`, `created_datetime`, `modified_datetime`, `deleted_datetime`, `last_connected_datetime`) VALUES
-(1, 1, 'JOSE''S FIRST GALILEO GEN 1', 'FIRST GALILEO GEN 1 I HAD', '2014-12-06 16:04:21', '2014-12-06 22:04:36', NULL, NULL);
+INSERT INTO `device_registry` (`device_id`, `account_id`, `device_nickname`, `device_description`, `api_key`, `created_datetime`, `modified_datetime`, `deleted_datetime`, `last_connected_datetime`) VALUES
+(1, 1, 'JOSE''S FIRST GALILEO GEN 1', 'FIRST GALILEO GEN 1 I HAD', 'c55452a9bdacdc0dc15919cdfe8d8f7d4c05ac5e', '2014-12-06 16:04:21', '2014-12-17 05:57:10', NULL, NULL),
+(2, 1, 'ALARMA LSM PR01', 'Laser Tripwire Alarm', '32c50daa34760183d9ec217ed775c60d155ac81c', '2014-12-16 23:56:35', '2014-12-17 06:00:58', NULL, NULL),
+(3, 1, 'WATER GRAY SYSTEM', 'Aguas Jabonosas Distribuidor', '61d39e42ea3b1244fb12db616daac0d7ff88bfc4', '2014-12-16 23:58:46', '2014-12-17 05:58:46', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -82,20 +94,56 @@ INSERT INTO `device_registry` (`device_id`, `account_id`, `device_nickname`, `de
 DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE IF NOT EXISTS `sessions` (
   `session_id` int(11) NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
   `token` varchar(200) COLLATE utf8_bin NOT NULL,
-  `email` varchar(200) COLLATE utf8_bin NOT NULL,
   `expiration_datetime` datetime NOT NULL,
   `created_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`session_id`),
   UNIQUE KEY `token` (`token`),
-  KEY `email` (`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Client Sessions' AUTO_INCREMENT=14 ;
+  KEY `account_id` (`account_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Client Sessions' AUTO_INCREMENT=15 ;
 
+--
+-- Truncate table before insert `sessions`
+--
+
+TRUNCATE TABLE `sessions`;
 --
 -- Dumping data for table `sessions`
 --
 
-INSERT INTO `sessions` (`session_id`, `token`, `email`, `expiration_datetime`, `created_datetime`, `modified_datetime`) VALUES
-(13, 'b6ab4d6426a67d22dd4fc657226794a4b7eba848', 'jose.a.nunez@gmail.com', '2014-12-06 16:50:49', '2014-12-06 15:10:25', '2014-12-06 21:50:49');
+INSERT INTO `sessions` (`session_id`, `account_id`, `token`, `expiration_datetime`, `created_datetime`, `modified_datetime`) VALUES
+(14, 1, '99aa3867e0d35758252f456b80d89c2b1bce167c', '2014-12-17 01:00:58', '2014-12-16 23:54:05', '2014-12-17 06:00:58');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vse_data`
+--
+
+DROP TABLE IF EXISTS `vse_data`;
+CREATE TABLE IF NOT EXISTS `vse_data` (
+  `entry_id` int(11) NOT NULL AUTO_INCREMENT,
+  `device_id` int(11) NOT NULL,
+  `vse_label` varchar(50) COLLATE utf8_bin NOT NULL,
+  `vse_value` varchar(200) COLLATE utf8_bin NOT NULL,
+  `vse_type` varchar(50) COLLATE utf8_bin NOT NULL,
+  `vse_annotations` text COLLATE utf8_bin,
+  `captured_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`entry_id`),
+  KEY `device_id` (`device_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=5530 ;
+
+--
+-- Truncate table before insert `vse_data`
+--
+
+TRUNCATE TABLE `vse_data`;
+--
+-- Dumping data for table `vse_data`
+--
+
+INSERT INTO `vse_data` (`entry_id`, `device_id`, `vse_label`, `vse_value`, `vse_type`, `vse_annotations`, `captured_datetime`, `created_datetime`) VALUES
+(5522, 1, 'DIRECT pvCloud TEST', '12345', 'numerico', NULL, '2014-12-09 21:01:00', '2014-12-10 00:28:57');

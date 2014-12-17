@@ -1,6 +1,6 @@
 <?php
 
-//TEST: http://localhost:8080/pvcloud_backend/vse_get_values.php?account_id=1&device_id=1&api_key=5eed4949398c5905578c8f17825e5316a4bec52b&optional_label=DIRECT+TEST&optional_last_limit=0
+//TEST: http://localhost:8080/pvcloud_backend/vse_get_values.php?account_id=1&device_id=1&api_key=c55452a9bdacdc0dc15919cdfe8d8f7d4c05ac5e&optional_label=DIRECT+TEST&optional_last_limit=0
 error_reporting(E_ERROR);
 
 require_once './DA/da_conf.php';
