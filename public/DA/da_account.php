@@ -66,8 +66,8 @@ class da_account {
 
         $confirmationGUID = uniqid();
 
-        $sqlCommand = "INSERT INTO accounts (email,nickname,pwd_hash, confirmation_guid)"
-                . "VALUES (?,?,?,?)";
+        $sqlCommand = "INSERT INTO accounts (email,nickname,pwd_hash, confirmation_guid, created_datetime)"
+                . "VALUES (?,?,?,?, NOW())";
 
         $paramTypeSpec = "ssss";
 

@@ -23,8 +23,8 @@ class da_session {
         if ($account_id > 0) {
             $token = sha1(uniqid() . $account_id);
 
-            $sqlCommand = "INSERT INTO sessions (token, account_id, expiration_datetime)"
-                    . "VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 HOUR))";
+            $sqlCommand = "INSERT INTO sessions (token, account_id, expiration_datetime, created_datetime)"
+                    . "VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 HOUR), NOW())";
 
             $paramTypeSpec = "si";
 

@@ -27,8 +27,8 @@ class da_devices_registry {
      * @return type
      */
     public static function RegisterNewDevice($device) {
-        $sqlCommand = "INSERT INTO device_registry (account_id,device_nickname,device_description,api_key)"
-                . "VALUES (?,?,?,SHA1(UUID()))";
+        $sqlCommand = "INSERT INTO device_registry (account_id,device_nickname,device_description,api_key, created_datetime)"
+                . "VALUES (?,?,?,SHA1(UUID()), NOW())";
 
         $paramTypeSpec = "sss";
 
