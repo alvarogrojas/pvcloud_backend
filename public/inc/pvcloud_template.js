@@ -136,7 +136,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;
 
-        wsURL += '&label=' + value_label;
+        wsURL += '&optional_label=' + value_label;
 
         request(wsURL, function (error, response, body) {
 
@@ -156,7 +156,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;
         
-        wsURL += '&label=' + value_label;
+        wsURL += '&optional_label=' + value_label;
 
         request(wsURL, function (error, response, body) {
 
@@ -176,7 +176,8 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;        
         
-        wsURL += '&label=' + value_label;
+        wsURL += '&optional_label=' + value_label;
+        wsURL += '&optional_last_limit=' + last_limit;
 
         request(wsURL, function (error, response, body) {
             if (!error && response.statusCode === 200) {
