@@ -11,7 +11,9 @@ function collectParameters() {
     $parameters->device_id = filter_input(INPUT_GET, "device_id");
     $parameters->account_id = filter_input(INPUT_GET, "account_id");
     $parameters->api_key = filter_input(INPUT_GET, "api_key");
-    $parameters->baseURL = "http://costaricamakers.com/pvcloud_backend/";
+    
+    
+    $parameters->baseURL = getBaseURL();
 
     return $parameters;
 }
@@ -30,6 +32,14 @@ function validate($parameters) {
 function setDownloadableJSHeaders() {
     header('Content-Type: application/js');
     header('Content-Disposition: attachment; filename="pvcloud_api.js"');
+}
+
+function getBaseURL(){
+    $server_https = filter_input(INPUT_SERVER,"HTTPS");
+    $server_port = filter_input(INPUT_SERVER,"SERVER_PORT");
+    $protocol = (!empty($server_https) && $server_https !== 'off' || $server_port == 443) ? "https://" : "http://";
+    $domainName = filter_input(INPUT_SERVER,"HTTP_HOST")."/";
+    return $protocol.$domainName."pvcloud_backend/";
 }
 
 function execute() {

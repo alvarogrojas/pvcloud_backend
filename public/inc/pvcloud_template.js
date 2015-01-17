@@ -11,10 +11,10 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
     log("process.argv: ");
     log(process.argv);
 
-    device_id = device_id || 2;
-    api_key = api_key || "32c50daa34760183d9ec217ed775c60d155ac81c";
-    account_id = account_id || 1;
-    baseURL = baseURL || "http://costaricamakers.com/pvcloud_backend/";
+    device_id = device_id || 0;
+    api_key = api_key || "";
+    account_id = account_id || 0;
+    baseURL = baseURL || "";
 
     var parameters = captureParameters();
 

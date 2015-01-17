@@ -135,5 +135,93 @@ class da_account {
 
         return $result;
     }
+    public static function GetAccountByID($account_id) {
+        $sqlCommand = "SELECT account_id,email,nickname,pwd_hash, confirmed, confirmation_guid, created_datetime, modified_datetime, deleted_datetime"
+                . " FROM accounts "
+                . " WHERE account_id = ? ";
+
+        $mysqli = DA_Helper::mysqli_connect();
+        if ($mysqli->connect_errno) {
+            $msg = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!($stmt = $mysqli->prepare($sqlCommand))) {
+            $msg = "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->bind_param("i", $account_id)) {
+            $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->execute()) {
+            $msg = "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        $result = new be_account();
+        $stmt->bind_result($result->account_id, $result->email, $result->nickname, $result->pwd_hash, $result->confirmed, $result->confirmation_guid, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime);
+
+        if (!$stmt->fetch()) {
+            $result = NULL;
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+    
+    /**
+     * Updates the data of an account
+     * @param be_account $account
+     * @return be_account
+     */
+    public static function UpdateAccount($account) {
+        $sqlCommand = "UPDATE accounts "
+                . " SET confirmation_guid = ?,"
+                . " confirmed = ?,"
+                . " deleted_datetime = ?,"
+                . " email = ?,"
+                . " nickname = ?,"
+                . " pwd_hash = ?"
+                . " WHERE account_id = ? ";
+
+        $paramTypeSpec = "sissssi";
+
+        $mysqli = DA_Helper::mysqli_connect();
+        if ($mysqli->connect_errno) {
+            $msg = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+            throw new Exception($msg, $mysqli->connect_errno);
+        }
+
+        if (!($stmt = $mysqli->prepare($sqlCommand))) {
+            $msg = "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->bind_param($paramTypeSpec, 
+                $account->confirmation_guid,
+                $account->confirmed,
+                $account->deleted_datetime, 
+                $account->email,
+                $account->nickname,
+                $account->pwd_hash,
+                $account->account_id)) {
+            $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->execute()) {
+            $msg = "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        $stmt->close();
+
+        $savedAccount = da_account::GetAccount($account->email);
+        return $savedAccount;
+    }    
 
 }
