@@ -98,6 +98,12 @@ class da_account {
         return $retreivedAccount;
     }
 
+    /**
+     * 
+     * @param string $email
+     * @return be_account
+     * @throws Exception
+     */
     public static function GetAccount($email) {
         $sqlCommand = "SELECT account_id,email,nickname,pwd_hash, confirmed, confirmation_guid, created_datetime, modified_datetime, deleted_datetime"
                 . " FROM accounts "
