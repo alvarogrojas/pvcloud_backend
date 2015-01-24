@@ -56,9 +56,13 @@ class WebServiceClass {
         $message .= "Si usted no solicitó un cambio de contraseña, puede que alguien esté intentando violentar su cuenta;\n\n";
         $message .= "en cuyo caso por favor reporte el incidente a pvcloud_seguridad@costaricamakers.com\n\n";
         $to = $account->email;
+        
         $subject = "pvCloud - Recuperación de Contraseña";
-        $headers = 'From: donotreply@costaricamakers.com' . "\r\n";
-
+        
+        $enter = "\r\n";
+        $headers = "From: donotreply@costaricamakers.com $enter";
+        $headers .= "MIME-Version: 1.0 $enter";
+        $headers .= "Content-type: text/plain; charset=utf-8 $enter";
 
         $result = mail($to, $subject, $message, $headers);
     }

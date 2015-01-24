@@ -49,7 +49,7 @@ class DA_Helper {
         $result = DA_Helper::ExecuteNonParametricQuery($sqlCommand);
 
         $row = mysql_fetch_assoc($result);
-        
+
         return ($row['NOW']);
     }
 

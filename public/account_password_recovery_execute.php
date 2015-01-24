@@ -25,19 +25,28 @@ class WebServiceClass {
             $parameters = WebServiceClass::collectParameters();
 
             $account = da_account::GetAccountByID($parameters->AccountID);
-            
+
             if ($account != NULL) {
                 if ($account->email != "" && $parameters->Email == $account->email) {
                     if ($account->confirmation_guid == $parameters->ConfirmationCode) {
-                        $account->pwd_hash = sha1($parameters->Password);
-                        $savedAccount = da_account::UpdateAccount($account);
-                        if ($savedAccount != NULL && $savedAccount->account_id == $account->account_id) {
-                            $response->status = "OK";
-                            $response->message = "Contraseña Actualizada Satisfactoriamente";
-                            WebServiceClass::sendPWRecoveryEmail($account);
+                        $accountModificationTime = new DateTime($account->modified_datetime);
+                        $currentDateTime = new DateTime(DA_Helper::GetServerDate());
+                        $difference = $currentDateTime->diff($accountModificationTime);
+
+                        if ($difference->d == 0) {
+                            $account->pwd_hash = sha1($parameters->Password);
+                            $savedAccount = da_account::UpdateAccount($account);
+                            if ($savedAccount != NULL && $savedAccount->account_id == $account->account_id) {
+                                $response->status = "OK";
+                                $response->message = "Contraseña Actualizada Satisfactoriamente";
+                                WebServiceClass::sendPWRecoveryEmail($account);
+                            } else {
+                                $response->status = "ERROR";
+                                $response->message = "Solicitud Inválida";
+                            }
                         } else {
                             $response->status = "ERROR";
-                            $response->message = "Solicitud Inválida";
+                            $response->message = "Solicitud Expirada";
                         }
                     } else {
                         $response->status = "ERROR";
@@ -70,8 +79,12 @@ class WebServiceClass {
         $message = "Le comunicamos que el proceso de recuperación de contraseña fue completado con éxito.\n\n";
         $to = $account->email;
         $subject = "pvCloud - Recuperación de Contraseña Completada";
-        $headers = 'From: donotreply@costaricamakers.com' . "\r\n";
-        
+
+        $enter = "\r\n";
+        $headers = "From: donotreply@costaricamakers.com $enter";
+        $headers .= "MIME-Version: 1.0 $enter";
+        $headers .= "Content-type: text/plain; charset=utf-8 $enter";
+
         $result = mail($to, $subject, $message, $headers);
     }
 
@@ -87,14 +100,14 @@ class WebServiceClass {
 
 }
 
-$result  = WebServiceClass::PasswordRecovery_Execute();
+$result = WebServiceClass::PasswordRecovery_Execute();
 
-if($result->status=="OK"){
-    $url=  getBaseURL("pvcloud")."#/prs";
+if ($result->status == "OK") {
+    $url = getBaseURL("pvcloud") . "#/prs";
     header("Location: $url");
 } else {
-    $url=  getBaseURL("pvcloud")."#/err";
-    
-    header("Location: $url");    
+    $url = getBaseURL("pvcloud") . "#/err";
+
+    header("Location: $url");
 }
 
