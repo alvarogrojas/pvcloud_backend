@@ -141,6 +141,13 @@ class da_account {
 
         return $result;
     }
+    
+    /**
+     * 
+     * @param int $account_id
+     * @return be_account
+     * @throws Exception
+     */
     public static function GetAccountByID($account_id) {
         $sqlCommand = "SELECT account_id,email,nickname,pwd_hash, confirmed, confirmation_guid, created_datetime, modified_datetime, deleted_datetime"
                 . " FROM accounts "
