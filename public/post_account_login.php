@@ -113,7 +113,7 @@ switch ($result->status) {
         $token = $result->data->token;
         $account_id = $result->data->account_id;
         $email = $result->data->email;
-        $url = getBaseURL("pvcloud") . "#/mycloud_login/$email/$account_id/$token";
+        $url = getClientBaseURL("pvcloud") . "#/mycloud_login/$email/$account_id/$token";
         header("Location: $url");
         break;
     case "ERROR":
