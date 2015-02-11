@@ -117,10 +117,11 @@ switch ($result->status) {
         header("Location: $url");
         break;
     case "ERROR":
-        $url = getBaseURL("pvcloud") . "#/login_err";
+        $url = getClientBaseURL("pvcloud") . "#/mycloud_login/invalid_credentials";
         header("Location: $url");
+        break;
     default: //EXCEPTION CASE
-        $url = getBaseURL("pvcloud") . "#/err";
+        $url = getClientBaseURL("pvcloud") . "#/err";
         header("Location: $url");        
 }
 

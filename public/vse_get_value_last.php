@@ -10,6 +10,9 @@ require_once './DA/da_session.php';
 require_once './DA/da_devices_registry.php';
 require_once './DA/da_vse_data.php';
 
+include_once './inc/incJSONHeaders.php';
+include_once './inc/incBaseURL.php';
+
 /**
  * 
  * 
@@ -30,6 +33,7 @@ function execute() {
     } catch (Exception $ex) {
         die("EXCEPTION " . $ex->getCode());
     }
+
     return $entries;
 }
 
