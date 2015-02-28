@@ -4,7 +4,7 @@
 
 var request = require('request');
 
-var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
+var pvCloudModule = function (device_id, api_key, account_id, baseURL) {
     var DEBUG = false;
 
     log("started");
@@ -21,16 +21,16 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
     if (validateParameters()) {
         switch (parameters.action) {
             case "add_value":
-                pvCloud_AddValue(device_id, parameters.value_label, parameters.value, parameters.value_type, parameters.captured_datetime);
+                pvCloud_AddValue(parameters.value_label, parameters.value, parameters.value_type, parameters.captured_datetime);
                 break;
             case "get_last_value":
-                pvCloud_GetLastValue(device_id, parameters.value_label);
+                pvCloud_GetLastValue(parameters.value_label);
                 break;
             case "get_values":
-                pvCloud_GetValues(device_id, parameters.value_label, parameters.last_limit);
+                pvCloud_GetValues(parameters.value_label, parameters.last_limit);
                 break;
             case "clear_values":
-                pvCloud_ClearValues(device_id, parameters.value_label);
+                pvCloud_ClearValues(parameters.value_label);
                 break;
         }
     }
@@ -91,7 +91,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
                     parameters.value_label = "";
                 break;
             default:
-                throw ("Invalid Action");
+                //throw ("Invalid Action");
         }
 
         return true;
@@ -103,7 +103,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
         }
     }
 
-    function pvCloud_AddValue(device_id, value_label, value, value_type, captured_datetime) {
+    function pvCloud_AddValue(value_label, value, value_type, captured_datetime, callback) {
         log("AddValue()");
         var wsURL = baseURL;
         wsURL += "vse_add_value.php";
@@ -115,7 +115,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
         wsURL += '&value=' + value;
         wsURL += '&type=' + value_type;
         wsURL += '&captured_datetime=' + captured_datetime;
-        
+
         log(wsURL);
 
         request(wsURL, function (error, response, body) {
@@ -126,10 +126,13 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
                 console.log(response);
                 console.log(error);
             }
+            if (callback) {
+                callback(error, response, body);
+            }
         });
     }
 
-    function pvCloud_ClearValues(device_id, value_label) {
+    function pvCloud_ClearValues(value_label, callback) {
         var wsURL = baseURL;
         wsURL += "vse_clear_values.php";
         wsURL += '?device_id=' + device_id;
@@ -146,16 +149,19 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
                 console.log(response);
                 console.log(error);
             }
+            if (callback) {
+                callback(error, response, body);
+            }
         });
     }
 
-    function pvCloud_GetLastValue(device_id, value_label) {
+    function pvCloud_GetLastValue(value_label, callback) {
         var wsURL = baseURL;
         wsURL += "vse_get_value_last.php";
         wsURL += '?device_id=' + device_id;
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;
-        
+
         wsURL += '&optional_label=' + value_label;
 
         request(wsURL, function (error, response, body) {
@@ -166,16 +172,19 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
                 console.log(response);
                 console.log(error);
             }
+            if (callback) {
+                callback(error, response, body);
+            }
         });
     }
 
-    function pvCloud_GetValues(device_id, value_label, last_limit) {
+    function pvCloud_GetValues(value_label, last_limit, callback) {
         var wsURL = baseURL;
         wsURL += "vse_get_values.php";
         wsURL += '?device_id=' + device_id;
         wsURL += '&api_key=' + api_key;
-        wsURL += '&account_id=' + account_id;        
-        
+        wsURL += '&account_id=' + account_id;
+
         wsURL += '&optional_label=' + value_label;
         wsURL += '&optional_last_limit=' + last_limit;
 
@@ -186,6 +195,16 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL ){
                 console.log(response);
                 console.log(error);
             }
+            if (callback) {
+                callback(error, response, body);
+            }
         });
     }
+
+    return {
+        Add: pvCloud_AddValue,
+        Clear: pvCloud_ClearValues,
+        GetLastValue: pvCloud_GetLastValue,
+        GetValues: pvCloud_GetValues
+    };
 };

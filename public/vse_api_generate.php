@@ -66,4 +66,4 @@ function execute() {
 $parameters = execute();
 $script = file_get_contents("inc/pvcloud_template.js");
 echo($script);
-echo (" pvCloudModule($parameters->device_id, '$parameters->api_key',$parameters->account_id, '$parameters->baseURL' );\n\r");
+echo (" exports.API = pvCloudModule($parameters->device_id, '$parameters->api_key',$parameters->account_id, '$parameters->baseURL' );\n\r");
