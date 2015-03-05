@@ -46,7 +46,7 @@ class WebServiceClass {
                 $response->data->email = $account->email;
             } else {
                 $response->status = "ERROR";
-                $response->message = "Crenciales equivocadas";
+                $response->message = "Credenciales equivocadas";
             }
         } catch (Exception $ex) {
             $response->status = "EXCEPTION";
@@ -113,7 +113,7 @@ switch ($result->status) {
         $token = $result->data->token;
         $account_id = $result->data->account_id;
         $email = $result->data->email;
-        $url = getClientBaseURL("pvcloud") . "#/mycloud_login/$email/$account_id/$token";
+        $url = getClientBaseURL("pvcloud") . "#/login_data/$email/$account_id/$token";
         header("Location: $url");
         break;
     case "ERROR":
