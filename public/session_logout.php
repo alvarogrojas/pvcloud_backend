@@ -1,56 +1,69 @@
 <?php
 
-/* * *
- * http://localhost:8080/pvcloud_backend/account_authenticate.php?email=jose.a.nunez@gmail.com&pwd=1234pass
- * 
- * * */
 error_reporting(E_ERROR);
-
-class simpleResponse {
-
-    public $status = "";
-    public $message = "";
-
-}
 
 require_once './DA/da_conf.php';
 require_once './DA/da_helper.php';
+
 require_once './DA/da_account.php';
 require_once './DA/da_session.php';
+require_once './inc/SimpleResponse.php';
 
-/**
- * Validates email + token provcided in query string and returns simpleResponse object with status (OK, ERROR, EXCEPTION) and a message
- * 
- * @return \simpleResponse
- */
-function validate() {
-    $response = new simpleResponse();
-    $account_id = filter_input(INPUT_GET, "account_id");
-    $token = filter_input(INPUT_GET, "token");
 
-    try {
+class LogoutWebService {
 
-        if ($account_id == 0 || $account_id == "" || $account_id == NULL || $token == "" || $token == NULL) {
-            $response->status = "ERROR";
-            $response->message = "La sesión no es válida. Por favor autentíquese nuevamente";
-        } else {
-            $session = da_session::GetAndValidateSession($account_id, $token);
+    /**
+     * 
+     * @return be_session
+     */
+    public static function DoLogout() {
+        try {
+            $response = new SimpleResponse();
 
-            if ($session->account_id == $account_id && $session->token == $token) {
-                $response->status = "OK";
-                $response->message = "Sesión válida";
+            $parameters = LogoutWebService::collectParameters();
+
+            if (LogoutWebService::parametersAreValid($parameters)) {
+                $response = LogoutWebService::executeLogout($parameters);
             } else {
                 $response->status = "ERROR";
-                $response->message = "La sesión no es válida. Por favor autentíquese nuevamente";
+                $response->message = "Solicitud inválida. Por favor autentíquese nuevamente";
             }
+        } catch (Exception $ex) {
+            $response->status = "EXCEPTION";
+            $response->message = $ex->getMessage();
         }
-    } catch (Exception $ex) {
-        $response->status = "EXCEPTION";
-        $response->message = $ex->getMessage();
+
+        return response;
     }
 
-    return $response;
+    private static function collectParameters() {
+        $parameters = new stdClass();
+        $parameters->account_id = filter_input(INPUT_GET, "account_id");
+        $parameters->token = filter_input(INPUT_GET, "token");
+        return $parameters;
+    }
+
+    private static function parametersAreValid($parameters) {
+        return !($parameters->account_id == 0 || $parameters->account_id == "" || $parameters->account_id == NULL || $parameters->token == "" || $parameters->token == NULL);
+    }
+
+    private static function resultIsValid($session, $parameters) {
+        return $session->account_id == $parameters->account_id && $session->token == $parameters->token;
+    }
+
+    private static function executeLogout($parameters) {
+        $session = da_session::Logout($parameters->account_id, $parameters->token);
+        if (LogoutWebService::resultIsValid($session, $parameters)) {
+            $response->status = "OK";
+            $response->message = "LOGOUT OK";
+        } else {
+            $response->status = "ERROR";
+            $response->message = "El proceso de Logout falló";
+        }
+    }
 }
 
+$result = LogoutWebService::DoLogout();
+
 include './inc/incJSONHeaders.php';
-echo json_encode(validate());
+echo json_encode($result);

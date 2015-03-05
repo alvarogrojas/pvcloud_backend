@@ -16,10 +16,11 @@ require_once './DA/da_vse_data.php';
         <?php
         ReportInfo("Initiating Tests!");
 
-        //TEST_DASession::test_da_session();
+        TEST_DASession::test_da_session();
+        
         //TEST_DADevice::test_da_device();
 
-        TEST_DAVSEValue::Test();
+        //TEST_DAVSEValue::Test();
 
         ReportInfo("Tests Finished!");
         ?> 
@@ -179,6 +180,18 @@ class TEST_DASession {
         } else {
             ReportError("Session seems to be BAD");
         }
+        
+        ReportInfo("Loging out...");
+        $loggedOffSession = da_session::Logout($session->account_id, $session->token);
+        ReportInfo("Session after Logout begins here..-------------------");
+        print_r($loggedOffSession);
+        ReportInfo("Session after Logout ends here..-------------------");
+        if($loggedOffSession->account_id == $session->account_id && $loggedOffSession->token ==$session->token && $loggedOffSession->expiration_datetime!=$session->expiration_datetime ){
+            ReportSuccess("Seems to be OK after logoff.");
+        } else{
+            ReportError("IT seems result is NOT OK. Is that a good session value for Logout?");
+        }
+        
         ReportInfo("Session Tests Complete!");
     }
 
