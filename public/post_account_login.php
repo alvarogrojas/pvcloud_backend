@@ -9,6 +9,6 @@
 
 include 'inc/incBaseURL.php';
 
-$url = getClientBaseURL("pvcdloud") . "#/";
+$url = getClientBaseURL("pvcloud") . "#/";
 
 header("Location: $url");
