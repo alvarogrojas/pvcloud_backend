@@ -4,14 +4,14 @@
 
 var request = require('request');
 
-var pvCloudModule = function (device_id, api_key, account_id, baseURL) {
+var pvCloudModule = function (app_id, api_key, account_id, baseURL) {
     var DEBUG = false;
 
     log("started");
     log("process.argv: ");
     log(process.argv);
 
-    device_id = device_id || 0;
+    app_id = app_id || 0;
     api_key = api_key || "";
     account_id = account_id || 0;
     baseURL = baseURL || "";
@@ -107,7 +107,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL) {
         log("AddValue()");
         var wsURL = baseURL;
         wsURL += "vse_add_value.php";
-        wsURL += '?device_id=' + device_id;
+        wsURL += '?app_id=' + app_id;
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;
 
@@ -135,7 +135,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL) {
     function pvCloud_ClearValues(value_label, callback) {
         var wsURL = baseURL;
         wsURL += "vse_clear_values.php";
-        wsURL += '?device_id=' + device_id;
+        wsURL += '?app_id=' + app_id;
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;
 
@@ -158,7 +158,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL) {
     function pvCloud_GetLastValue(value_label, callback) {
         var wsURL = baseURL;
         wsURL += "vse_get_value_last.php";
-        wsURL += '?device_id=' + device_id;
+        wsURL += '?app_id=' + app_id;
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;
 
@@ -181,7 +181,7 @@ var pvCloudModule = function (device_id, api_key, account_id, baseURL) {
     function pvCloud_GetValues(value_label, last_limit, callback) {
         var wsURL = baseURL;
         wsURL += "vse_get_values.php";
-        wsURL += '?device_id=' + device_id;
+        wsURL += '?app_id=' + app_id;
         wsURL += '&api_key=' + api_key;
         wsURL += '&account_id=' + account_id;
 

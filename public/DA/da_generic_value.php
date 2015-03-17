@@ -3,7 +3,7 @@
 class be_generic_value_entry {
 
     public $entry_id = 0;
-    public $device_id = 0;
+    public $app_id = 0;
     public $value_label = "";
     public $value = "";
     public $value_type_code = "";
@@ -20,14 +20,14 @@ class be_generic_value_entry {
 class da_generic_value {
 
     /**
-     * Retrieve the last entry for a given device and given optional valuelabel
-     * @param int $device_id
+     * Retrieve the last entry for a given app and given optional valuelabel
+     * @param int $app_id
      * @param string $value_label
      */
     public static function GetEntry($entry_id) {
         $sqlCommand = "SELECT "
                 . "entry_id,"
-                . "device_id,"
+                . "app_id,"
                 . "value_label,"
                 . "value,"
                 . "value_type_code,"
@@ -56,7 +56,7 @@ class da_generic_value {
         $valueEntry = new be_generic_value_entry();
 
         $stmt->bind_result(
-                $valueEntry->entry_id, $valueEntry->device_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
+                $valueEntry->entry_id, $valueEntry->app_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
 
         $stmt->fetch();
 
@@ -66,21 +66,21 @@ class da_generic_value {
     }
 
     /**
-     * Retrieve the last entry for a given device and given optional valuelabel
-     * @param int $device_id
+     * Retrieve the last entry for a given app and given optional valuelabel
+     * @param int $app_id
      * @param string $value_label
      */
-    public static function GetLastEntry($device_id, $value_label) {
+    public static function GetLastEntry($app_id, $value_label) {
         $sqlCommand = "SELECT "
                 . "entry_id,"
-                . "device_id,"
+                . "app_id,"
                 . "value_label,"
                 . "value,"
                 . "value_type_code,"
                 . "captured_datetime,"
                 . "created_datetime "
                 . "FROM generic_value_log "
-                . "WHERE device_id = ? AND (value_label = ? OR ? = '')"
+                . "WHERE app_id = ? AND (value_label = ? OR ? = '')"
                 . "ORDER BY entry_id desc "
                 . "LIMIT 1";
 
@@ -93,7 +93,7 @@ class da_generic_value {
             echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
         }
 
-        if (!$stmt->bind_param("iss", $device_id, $value_label, $value_label)) {
+        if (!$stmt->bind_param("iss", $app_id, $value_label, $value_label)) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 
@@ -104,7 +104,7 @@ class da_generic_value {
         $valueEntry = new be_generic_value_entry();
 
         $stmt->bind_result(
-                $valueEntry->entry_id, $valueEntry->device_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
+                $valueEntry->entry_id, $valueEntry->app_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
 
         $stmt->fetch();
 
@@ -115,20 +115,20 @@ class da_generic_value {
 
     /**
      * 
-     * @param int $device_id
+     * @param int $app_id
      * @return \be_generic_value_entry
      */
-    public static function GetLastDataByDeviceIDAndValueLabel($device_id, $value_label) {
+    public static function GetLastDataByAppIDAndValueLabel($app_id, $value_label) {
         $sqlCommand = "SELECT "
                 . "entry_id,"
-                . "device_id,"
+                . "app_id,"
                 . "value_label,"
                 . "value,"
                 . "value_type_code,"
                 . "captured_datetime,"
                 . "created_datetime "
                 . "FROM generic_value_log "
-                . "WHERE device_id = ? AND (value_label = ? OR ? = '') "
+                . "WHERE app_id = ? AND (value_label = ? OR ? = '') "
                 . "ORDER BY entry_id DESC "
                 . "LIMIT 1";
 
@@ -141,7 +141,7 @@ class da_generic_value {
             echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
         }
 
-        if (!$stmt->bind_param("iss", $device_id, $value_label, $value_label)) {
+        if (!$stmt->bind_param("iss", $app_id, $value_label, $value_label)) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 
@@ -152,7 +152,7 @@ class da_generic_value {
         $valueEntry = new be_generic_value_entry();
 
         $stmt->bind_result(
-                $valueEntry->entry_id, $valueEntry->device_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
+                $valueEntry->entry_id, $valueEntry->app_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
 
         $arrayResult = [];
         while ($stmt->fetch()) {
@@ -166,20 +166,20 @@ class da_generic_value {
     
     /**
      * 
-     * @param int $device_id
+     * @param int $app_id
      * @return \be_generic_value_entry
      */
-    public static function GetDataByDeviceIDAndValueLabel($device_id, $value_label) {
+    public static function GetDataByAppIDAndValueLabel($app_id, $value_label) {
         $sqlCommand = "SELECT "
                 . "entry_id,"
-                . "device_id,"
+                . "app_id,"
                 . "value_label,"
                 . "value,"
                 . "value_type_code,"
                 . "captured_datetime,"
                 . "created_datetime "
                 . "FROM generic_value_log "
-                . "WHERE device_id = ? AND (value_label = ? OR ? = '')";
+                . "WHERE app_id = ? AND (value_label = ? OR ? = '')";
 
         $mysqli = DA_Helper::mysqli_connect();
         if ($mysqli->connect_errno) {
@@ -190,7 +190,7 @@ class da_generic_value {
             echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
         }
 
-        if (!$stmt->bind_param("iss", $device_id, $value_label, $value_label)) {
+        if (!$stmt->bind_param("iss", $app_id, $value_label, $value_label)) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 
@@ -201,7 +201,7 @@ class da_generic_value {
         $valueEntry = new be_generic_value_entry();
 
         $stmt->bind_result(
-                $valueEntry->entry_id, $valueEntry->device_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
+                $valueEntry->entry_id, $valueEntry->app_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $valueEntry->created_datetime);
 
         $arrayResult = [];
         while ($stmt->fetch()) {
@@ -215,13 +215,13 @@ class da_generic_value {
 
     /**
      * 
-     * @param int $device_id
+     * @param int $app_id
      * @param string $value_label
      */
-    public static function DeleteDataByDeviceIDAndValueLabel($device_id, $value_label) {
+    public static function DeleteDataByAppIDAndValueLabel($app_id, $value_label) {
         $sqlCommand = "DELETE"
                 . " FROM generic_value_log "
-                . " WHERE device_id = ? AND (value_label = ? OR ? = '')";
+                . " WHERE app_id = ? AND (value_label = ? OR ? = '')";
 
        $mysqli = DA_Helper::mysqli_connect();
         if ($mysqli->connect_errno) {
@@ -232,7 +232,7 @@ class da_generic_value {
             echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
         }
 
-        if (!$stmt->bind_param("iss", $device_id, $value_label, $value_label)) {
+        if (!$stmt->bind_param("iss", $app_id, $value_label, $value_label)) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 
@@ -245,7 +245,7 @@ class da_generic_value {
         $result = new stdClass();
         
         $result->Status="DELETE SUCCESS";
-        $result->device_id = $device_id;
+        $result->app_id = $app_id;
         $result->value_label = $value_label;
         return $result;
     }
@@ -253,7 +253,7 @@ class da_generic_value {
     public static function GetAllData() {
         $sqlCommand = "SELECT "
                 . "entry_id,"
-                . "device_id,"
+                . "app_id,"
                 . "value_label,"
                 . "value,"
                 . "value_type_code,"
@@ -281,7 +281,7 @@ class da_generic_value {
         $created_datetime = DA_Helper::GetServerDate();
 
         $sqlCommand = "INSERT INTO generic_value_log ("
-                . "device_id,"
+                . "app_id,"
                 . "value_label,"
                 . "value,"
                 . "value_type_code,"
@@ -300,7 +300,7 @@ class da_generic_value {
         }
 
 
-        if (!$stmt->bind_param("isssss", $valueEntry->device_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $created_datetime
+        if (!$stmt->bind_param("isssss", $valueEntry->app_id, $valueEntry->value_label, $valueEntry->value, $valueEntry->value_type_code, $valueEntry->captured_datetime, $created_datetime
                 )) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }

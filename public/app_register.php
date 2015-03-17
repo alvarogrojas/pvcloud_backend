@@ -1,7 +1,7 @@
 <?php
 
 /* * *
- * http://localhost:8080/pvcloud_backend/device_get_list_by_account.php?account_id=1
+ * http://localhost:8080/pvcloud_backend/app_get_list_by_account.php?account_id=1
  * 
  * * */
 error_reporting(E_ERROR);
@@ -18,7 +18,7 @@ require_once './DA/da_conf.php';
 require_once './DA/da_helper.php';
 require_once './DA/da_account.php';
 require_once './DA/da_session.php';
-require_once './DA/da_devices_registry.php';
+require_once './DA/da_apps_registry.php';
 
 /**
  * 
@@ -31,17 +31,17 @@ function execute() {
         $account_id = 0; $token = 0;
         include './inc/incWebServiceSessionValidation.php';
         
-        $deviceToRegister = new be_device();
-        $deviceToRegister->account_id = $account_id;
-        $deviceToRegister->device_nickname = filter_input(INPUT_GET, "device_nickname");
-        $deviceToRegister->device_description = filter_input(INPUT_GET, "device_description");
+        $appToRegister = new be_app();
+        $appToRegister->account_id = $account_id;
+        $appToRegister->app_nickname = filter_input(INPUT_GET, "app_nickname");
+        $appToRegister->app_description = filter_input(INPUT_GET, "app_description");
 
-        if ($deviceToRegister->account_id > 0) {
-            if ($deviceToRegister->device_nickname !== "") {
-                $device = da_devices_registry::RegisterNewDevice($deviceToRegister);
+        if ($appToRegister->account_id > 0) {
+            if ($appToRegister->app_nickname !== "") {
+                $app = da_apps_registry::RegisterNewApp($appToRegister);
                 $response->status = "OK";
                 $response->message = "SUCCESS";
-                $response->data = $device;
+                $response->data = $app;
             } else {
                 $response->status = "ERROR";
                 $response->message = "Parámetro Inválido: Nombre de Dispositivo";

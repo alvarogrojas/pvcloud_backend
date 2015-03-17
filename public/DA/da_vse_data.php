@@ -6,7 +6,7 @@
 class be_vse_data {
 
     public $entry_id = 0;
-    public $device_id = 0;
+    public $app_id = 0;
     public $vse_label = "";
     public $vse_value = "";
     public $vse_type = "";
@@ -24,7 +24,7 @@ class da_vse_data {
      * @return \be_vse_data value inserted
      */
     public static function AddEntry($entry) {
-        $sqlCommand = "INSERT INTO vse_data (device_id,vse_label, vse_value, vse_type, vse_annotations,captured_datetime)"
+        $sqlCommand = "INSERT INTO vse_data (app_id,vse_label, vse_value, vse_type, vse_annotations,captured_datetime)"
                 . " VALUES (?,?,?,?,?,?)";
 
         $paramTypeSpec = "isssss";
@@ -40,7 +40,7 @@ class da_vse_data {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $entry->device_id, $entry->vse_label, $entry->vse_value, $entry->vse_type, $entry->vse_annotations, $entry->captured_datetime)) {
+        if (!$stmt->bind_param($paramTypeSpec, $entry->app_id, $entry->vse_label, $entry->vse_value, $entry->vse_type, $entry->vse_annotations, $entry->captured_datetime)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -59,15 +59,15 @@ class da_vse_data {
 
     /**
      * 
-     * @param int $device_id
-     * @param int $optional_vse_label Use it to retrieve specific labels for a device. Leave NULL to return all values of device regardless of label
+     * @param int $app_id
+     * @param int $optional_vse_label Use it to retrieve specific labels for a app. Leave NULL to return all values of app regardless of label
      * @param int $optional_last_limit Max Quantity to return. Will return last number of records specified.
      * @return array
      */
-    public static function GetEntries($device_id, $optional_vse_label, $optional_last_limit) {
-        $sqlCommand = "SELECT  entry_id,device_id,vse_label,vse_value,vse_type,vse_annotations,captured_datetime,created_datetime "
+    public static function GetEntries($app_id, $optional_vse_label, $optional_last_limit) {
+        $sqlCommand = "SELECT  entry_id,app_id,vse_label,vse_value,vse_type,vse_annotations,captured_datetime,created_datetime "
                 . " FROM vse_data "
-                . " WHERE device_id = ? AND (vse_label = ? OR ? = '') "
+                . " WHERE app_id = ? AND (vse_label = ? OR ? = '') "
                 . " ORDER BY entry_id DESC ";
 
 
@@ -84,7 +84,7 @@ class da_vse_data {
             echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
         }
 
-        if (!$stmt->bind_param("iss", $device_id, $optional_vse_label, $optional_vse_label)) {
+        if (!$stmt->bind_param("iss", $app_id, $optional_vse_label, $optional_vse_label)) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 
@@ -95,7 +95,7 @@ class da_vse_data {
         $entry = new be_vse_data();
 
         $stmt->bind_result(
-                $entry->entry_id, $entry->device_id, $entry->vse_label, $entry->vse_value, $entry->vse_type, $entry->vse_annotations, $entry->captured_datetime, $entry->created_datetime);
+                $entry->entry_id, $entry->app_id, $entry->vse_label, $entry->vse_value, $entry->vse_type, $entry->vse_annotations, $entry->captured_datetime, $entry->created_datetime);
 
         $arrayResult = [];
         while ($stmt->fetch()) {
@@ -109,14 +109,14 @@ class da_vse_data {
 
     /**
      * 
-     * @param type $device_id
+     * @param type $app_id
      * @param type $optional_vse_label
      * @return \be_vse_data
      */
-    public static function GetLastEntry($device_id, $optional_vse_label) {
-        $sqlCommand = "SELECT  entry_id,device_id,vse_label,vse_value,vse_type,vse_annotations,captured_datetime,created_datetime "
+    public static function GetLastEntry($app_id, $optional_vse_label) {
+        $sqlCommand = "SELECT  entry_id,app_id,vse_label,vse_value,vse_type,vse_annotations,captured_datetime,created_datetime "
                 . " FROM vse_data "
-                . " WHERE device_id = ? AND (vse_label = ? OR ? = '') "
+                . " WHERE app_id = ? AND (vse_label = ? OR ? = '') "
                 . " ORDER BY entry_id DESC"
                 . " LIMIT 1";
 
@@ -131,7 +131,7 @@ class da_vse_data {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param("iss", $device_id, $optional_vse_label, $optional_vse_label)) {
+        if (!$stmt->bind_param("iss", $app_id, $optional_vse_label, $optional_vse_label)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -143,7 +143,7 @@ class da_vse_data {
 
         $result = new be_vse_data();
         $stmt->bind_result(
-                $result->entry_id, $result->device_id, $result->vse_label, $result->vse_value, $result->vse_type, $result->vse_annotations, $result->captured_datetime, $result->created_datetime
+                $result->entry_id, $result->app_id, $result->vse_label, $result->vse_value, $result->vse_type, $result->vse_annotations, $result->captured_datetime, $result->created_datetime
         );
 
         if (!$stmt->fetch()) {
@@ -157,13 +157,13 @@ class da_vse_data {
 
     /**
      * 
-     * @param type $device_id
-     * @param type $optional_vse_label Use it to clear entries of an specific label for the provided device.
+     * @param type $app_id
+     * @param type $optional_vse_label Use it to clear entries of an specific label for the provided app.
      * @return boolean
      */
-    public static function ClearEntries($device_id, $optional_vse_label) {
+    public static function ClearEntries($app_id, $optional_vse_label) {
         $sqlCommand = "DELETE FROM vse_data "
-                . " WHERE device_id = ? AND (vse_label = ? OR ? = '') ";
+                . " WHERE app_id = ? AND (vse_label = ? OR ? = '') ";
 
         $paramTypeSpec = "iss";
 
@@ -178,7 +178,7 @@ class da_vse_data {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $device_id, $optional_vse_label, $optional_vse_label)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app_id, $optional_vse_label, $optional_vse_label)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -190,7 +190,7 @@ class da_vse_data {
 
         $stmt->close();
 
-        $retrievedEntries = da_vse_data::GetEntries($device_id, $optional_vse_label, 0);
+        $retrievedEntries = da_vse_data::GetEntries($app_id, $optional_vse_label, 0);
         return $retrievedEntries;
     }
 
@@ -200,7 +200,7 @@ class da_vse_data {
      * @return \be_vse_data
      */
     private static function getSpecificEntry($entry_id) {
-        $sqlCommand = "SELECT  entry_id,device_id,vse_label,vse_value,vse_type,vse_annotations,captured_datetime,created_datetime "
+        $sqlCommand = "SELECT  entry_id,app_id,vse_label,vse_value,vse_type,vse_annotations,captured_datetime,created_datetime "
                 . " FROM vse_data WHERE entry_id = ? ";
 
         $mysqli = DA_Helper::mysqli_connect();
@@ -226,7 +226,7 @@ class da_vse_data {
 
         $result = new be_vse_data();
         $stmt->bind_result(
-                $result->entry_id, $result->device_id, $result->vse_label, $result->vse_value, $result->vse_type, $result->vse_annotations, $result->captured_datetime, $result->created_datetime
+                $result->entry_id, $result->app_id, $result->vse_label, $result->vse_value, $result->vse_type, $result->vse_annotations, $result->captured_datetime, $result->created_datetime
         );
 
         if (!$stmt->fetch()) {

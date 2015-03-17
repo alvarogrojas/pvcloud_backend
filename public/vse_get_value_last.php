@@ -1,13 +1,13 @@
 <?php
 
-//TEST: http://localhost:8080/pvcloud_backend/vse_get_value_last.php?account_id=1&device_id=1&api_key=c55452a9bdacdc0dc15919cdfe8d8f7d4c05ac5e&optional_label=DIRECT+TEST
+//TEST: http://localhost:8080/pvcloud_backend/vse_get_value_last.php?account_id=1&app_id=1&api_key=c55452a9bdacdc0dc15919cdfe8d8f7d4c05ac5e&optional_label=DIRECT+TEST
 error_reporting(E_ERROR);
 
 require_once './DA/da_conf.php';
 require_once './DA/da_helper.php';
 require_once './DA/da_account.php';
 require_once './DA/da_session.php';
-require_once './DA/da_devices_registry.php';
+require_once './DA/da_apps_registry.php';
 require_once './DA/da_vse_data.php';
 
 include_once './inc/incJSONHeaders.php';
@@ -26,7 +26,7 @@ function execute() {
         $parameters = collectParameters();
 
         if (validate($parameters)) {
-            $entries = da_vse_data::GetLastEntry($parameters->device_id, $parameters->optional_vse_label);
+            $entries = da_vse_data::GetLastEntry($parameters->app_id, $parameters->optional_vse_label);
         } else {
             die("Parámetros Inválidos");
         }
@@ -39,7 +39,7 @@ function execute() {
 
 function collectParameters() {
     $parameters = new stdClass();
-    $parameters->device_id = filter_input(INPUT_GET, "device_id");
+    $parameters->app_id = filter_input(INPUT_GET, "app_id");
     $parameters->optional_vse_label = filter_input(INPUT_GET, "optional_label");
 
     if (!isset($parameters->optional_vse_label) || $parameters->optional_vse_label == NULL) {
@@ -50,7 +50,7 @@ function collectParameters() {
 }
 
 function validate($parameters) {
-    if (is_numeric($parameters->device_id) && $parameters->device_id > 0) {
+    if (is_numeric($parameters->app_id) && $parameters->app_id > 0) {
         if (is_string($parameters->optional_vse_label)) {
             return true;
         }

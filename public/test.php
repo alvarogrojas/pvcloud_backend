@@ -3,7 +3,7 @@ require_once './DA/da_conf.php';
 require_once './DA/da_helper.php';
 require_once './DA/da_account.php';
 require_once './DA/da_session.php';
-require_once './DA/da_devices_registry.php';
+require_once './DA/da_apps_registry.php';
 require_once './DA/da_vse_data.php';
 ?>
 <!DOCTYPE html>
@@ -18,7 +18,7 @@ require_once './DA/da_vse_data.php';
 
         TEST_DASession::test_da_session();
         
-        //TEST_DADevice::test_da_device();
+        //TEST_DAApp::test_da_app();
 
         //TEST_DAVSEValue::Test();
 
@@ -29,55 +29,55 @@ require_once './DA/da_vse_data.php';
 
 <?php
 
-class TEST_DADevice {
+class TEST_DAApp {
 
-    public static function test_da_device() {
+    public static function test_da_app() {
         $testName = "DA DEVICE TEST";
         ReportInfo("Initiating $testName");
 
-        $createdDevice = TEST_DADevice::testDeviceCreation();
+        $createdApp = TEST_DAApp::testAppCreation();
 
-        TEST_DADevice::testDeviceListRetrieval();
+        TEST_DAApp::testAppListRetrieval();
 
-        $modifiedDevice = TEST_DADevice::testDeviceModification($createdDevice);
+        $modifiedApp = TEST_DAApp::testAppModification($createdApp);
 
-        $apiGenerationDevice = TEST_DADevice::testAPIKeyRegeneration($modifiedDevice);
+        $apiGenerationApp = TEST_DAApp::testAPIKeyRegeneration($modifiedApp);
 
-        $deletedDevice = TEST_DADevice::testDeviceDeletion($apiGenerationDevice);
+        $deletedApp = TEST_DAApp::testAppDeletion($apiGenerationApp);
 
-        TEST_DADevice::testDeviceListRetrieval();
+        TEST_DAApp::testAppListRetrieval();
 
         ReportInfo("Complete: $testName");
     }
 
-    private static function testDeviceCreation() {
-        $newDevice = new be_device();
-        $newDevice->account_id = 1;
-        $newDevice->device_nickname = "JN GALILEO1";
-        $newDevice->device_description = "";
+    private static function testAppCreation() {
+        $newApp = new be_app();
+        $newApp->account_id = 1;
+        $newApp->app_nickname = "JN GALILEO1";
+        $newApp->app_description = "";
 
-        ReportInfo("Device to Create:");
-        print_r($newDevice);
+        ReportInfo("App to Create:");
+        print_r($newApp);
 
-        $registeredDevice = da_devices_registry::RegisterNewDevice($newDevice);
-        ReportInfo("Device Created:");
-        print_r($registeredDevice);
+        $registeredApp = da_apps_registry::RegisterNewApp($newApp);
+        ReportInfo("App Created:");
+        print_r($registeredApp);
 
-        if ($registeredDevice->device_id > 0) {
-            ReportSuccess("Created Device seems to be OK!");
+        if ($registeredApp->app_id > 0) {
+            ReportSuccess("Created App seems to be OK!");
         } else {
-            ReportError("Created device seems to be WRONG! :(");
+            ReportError("Created app seems to be WRONG! :(");
         }
 
-        return $registeredDevice;
+        return $registeredApp;
     }
 
-    private static function testDeviceListRetrieval() {
-        ReportInfo("Testing retrieval of a list of devices for an account...");
+    private static function testAppListRetrieval() {
+        ReportInfo("Testing retrieval of a list of apps for an account...");
         $account_id = 1;
-        $devices = da_devices_registry::GetListOfDevices($account_id);
-        print_r($devices);
-        if (count($devices) > 0) {
+        $apps = da_apps_registry::GetListOfApps($account_id);
+        print_r($apps);
+        if (count($apps) > 0) {
             ReportSuccess("Result seems to be fine.");
         } else {
             ReportSuccess("Result seems to be WRONG");
@@ -86,84 +86,84 @@ class TEST_DADevice {
 
     /**
      * 
-     * @param be_device $deviceToModify
-     * @return be_device
+     * @param be_app $appToModify
+     * @return be_app
      */
-    private static function testDeviceModification($deviceToModify) {
+    private static function testAppModification($appToModify) {
 
-        ReportInfo("Device to Modify:");
-        print_r($deviceToModify);
+        ReportInfo("App to Modify:");
+        print_r($appToModify);
 
-        $deviceToModify->device_nickname = "JN_GALILEO_MODIFIED";
-        $deviceToModify->device_description = "Modified Galielo Entry";
+        $appToModify->app_nickname = "JN_GALILEO_MODIFIED";
+        $appToModify->app_description = "Modified Galielo Entry";
 
-        $modifiedDevice = da_devices_registry::UpdateDevice($deviceToModify);
+        $modifiedApp = da_apps_registry::UpdateApp($appToModify);
 
-        if ($modifiedDevice->device_nickname == $deviceToModify->device_nickname && $modifiedDevice->device_description == $deviceToModify->device_description) {
-            ReportSuccess("Device Seems to be properly modified");
+        if ($modifiedApp->app_nickname == $appToModify->app_nickname && $modifiedApp->app_description == $appToModify->app_description) {
+            ReportSuccess("App Seems to be properly modified");
         } else {
-            ReportError("Device Modification seemed to fail!");
+            ReportError("App Modification seemed to fail!");
         }
 
-        $deviceToModify->device_nickname = "JN GALILEO MODIFIED 2";
+        $appToModify->app_nickname = "JN GALILEO MODIFIED 2";
         ReportInfo("Second Modification:");
-        print_r($deviceToModify);
+        print_r($appToModify);
 
-        $modifiedDevice = da_devices_registry::UpdateDevice($deviceToModify);
+        $modifiedApp = da_apps_registry::UpdateApp($appToModify);
 
-        if ($modifiedDevice->device_nickname == $deviceToModify->device_nickname && $modifiedDevice->device_description == $deviceToModify->device_description) {
-            ReportSuccess("Device Seems to be properly modified");
+        if ($modifiedApp->app_nickname == $appToModify->app_nickname && $modifiedApp->app_description == $appToModify->app_description) {
+            ReportSuccess("App Seems to be properly modified");
         } else {
-            ReportError("Device Modification seemed to fail!");
+            ReportError("App Modification seemed to fail!");
         }
 
-        return $modifiedDevice;
+        return $modifiedApp;
     }
 
     /**
      * 
-     * @param be_device $deviceToModify
-     * @return be_device
+     * @param be_app $appToModify
+     * @return be_app
      */
-    private static function testAPIKeyRegeneration($deviceToModify) {
-        ReportInfo("Device to Generate API KEY for:");
-        print_r($deviceToModify);
+    private static function testAPIKeyRegeneration($appToModify) {
+        ReportInfo("App to Generate API KEY for:");
+        print_r($appToModify);
 
-        $modifiedDevice = da_devices_registry::RegenerateApiKey($deviceToModify->device_id);
+        $modifiedApp = da_apps_registry::RegenerateApiKey($appToModify->app_id);
 
-        ReportInfo("Device with new API KEY:");
-        print_r($modifiedDevice);
+        ReportInfo("App with new API KEY:");
+        print_r($modifiedApp);
 
-        if ($modifiedDevice->api_key != "" && $modifiedDevice->api_key != $deviceToModify->api_key) {
+        if ($modifiedApp->api_key != "" && $modifiedApp->api_key != $appToModify->api_key) {
             ReportSuccess("API KEY properly modified");
         } else {
             ReportError("API KEY GENERQATION seemed to fail!");
         }
 
-        return $modifiedDevice;
+        return $modifiedApp;
     }
 
     /**
      * 
-     * @param be_device $deviceToDelete
-     * @return be_device
+     * @param be_app $appToDelete
+     * @return be_app
      */
-    private static function testDeviceDeletion($deviceToDelete) {
-        ReportInfo("Device to DELETE:");
-        print_r($deviceToDelete);
+    private static function testAppDeletion($appToDelete) {
+        ReportInfo("App to DELETE:");
+        print_r($appToDelete);
 
-        $deletedDevice = da_devices_registry::DeleteDevice($deviceToDelete->device_id);
+        $deletedApp = da_apps_registry::DeleteApp($appToDelete->app_id);
 
         ReportInfo("RESULT:");
-        print_r($deletedDevice);
+        print_r($deletedApp);
 
-        if ($deletedDevice->deleted_datetime != NULL) {
+        if ($deletedApp->deleted_datetime != NULL) {
             ReportSuccess("API KEY properly modified");
         } else {
             ReportError("API KEY GENERQATION seemed to fail!");
         }
 
-        return $deletedDevice;
+        return $deletedApp;
     }
 
 }
@@ -218,7 +218,7 @@ class TEST_DAVSEValue {
         $successfulHits = 0;
         for ($i = 0; $i < 100; $i++) {
             $entryToAdd = new be_vse_data();
-            $entryToAdd->device_id = 1;
+            $entryToAdd->app_id = 1;
             $entryToAdd->vse_label = "TEST_DATA_$uuid";
             $entryToAdd->vse_value = $i;
             $entryToAdd->vse_type = "NUMBER";
@@ -226,7 +226,7 @@ class TEST_DAVSEValue {
             $entryToAdd->captured_datetime = date("Y-m-d H:i:s");
             $addedEntry = da_vse_data::AddEntry($entryToAdd);
 
-            if ($addedEntry->entry_id > 0 && $addedEntry->device_id == $entryToAdd->device_id && $addedEntry->vse_annotations == $entryToAdd->vse_annotations) {
+            if ($addedEntry->entry_id > 0 && $addedEntry->app_id == $entryToAdd->app_id && $addedEntry->vse_annotations == $entryToAdd->vse_annotations) {
                 $successfulHits++;
             } else {
                 ReportError("Oops! Entry addition seems failed!");
@@ -242,34 +242,34 @@ class TEST_DAVSEValue {
     }
 
     private static function testGetEntries($uuid) {
-        ReportInfo("Testing GET All Entries - Phase 1: Just device limit");
+        ReportInfo("Testing GET All Entries - Phase 1: Just app limit");
         $entries_test_01 = da_vse_data::GetEntries(1, '', 0);
 
         if (count($entries_test_01) >= 100) {
-            ReportSuccess("Just retrieved " . count($entries_test_01) . " entries for device 1. no additional filters");
+            ReportSuccess("Just retrieved " . count($entries_test_01) . " entries for app 1. no additional filters");
         } else {
-            ReportError("Just retrieved " . count($entries_test_01) . " entries for device 1. no additional filters");
+            ReportError("Just retrieved " . count($entries_test_01) . " entries for app 1. no additional filters");
         }
         print_r($entries_test_01);
 
-        ReportInfo("Testing GET All Entries - Phase 2: Device and Label limits");
+        ReportInfo("Testing GET All Entries - Phase 2: App and Label limits");
         $targetLabel = "TEST_DATA_$uuid";
         $entries_test_02 = da_vse_data::GetEntries(1, $targetLabel, 0);
         if (count($entries_test_02) == 100) {
-            ReportSuccess("Just retrieved " . count($entries_test_02) . " entries for device 1. Label Filter");
+            ReportSuccess("Just retrieved " . count($entries_test_02) . " entries for app 1. Label Filter");
         } else {
-            ReportError("Just retrieved " . count($entries_test_02) . " entries for device 1. Label Filter");
+            ReportError("Just retrieved " . count($entries_test_02) . " entries for app 1. Label Filter");
         }
         print_r($entries_test_02);
 
 
-        ReportInfo("Testing GET All Entries - Phase 3:  Device, Label and Count Limits");
+        ReportInfo("Testing GET All Entries - Phase 3:  App, Label and Count Limits");
         $entries_test_03 = da_vse_data::GetEntries(1, $targetLabel, 50);
 
         if (count($entries_test_03) == 50) {
-            ReportSuccess("Just retrieved " . count($entries_test_03) . " entries for device 1. Label Filter + last 50 filter");
+            ReportSuccess("Just retrieved " . count($entries_test_03) . " entries for app 1. Label Filter + last 50 filter");
         } else {
-            ReportError("Just retrieved " . count($entries_test_03) . " entries for device 1. Label Filter + last 50 filter");
+            ReportError("Just retrieved " . count($entries_test_03) . " entries for app 1. Label Filter + last 50 filter");
         }
 
 
@@ -277,7 +277,7 @@ class TEST_DAVSEValue {
     }
 
     private static function testGetLastEntry() {
-        ReportInfo("Testing to get the last entry of a device without Label Filter");
+        ReportInfo("Testing to get the last entry of a app without Label Filter");
         $lastEntry01 = da_vse_data::GetLastEntry(1, '');
         print_r($lastEntry01);
         ReportInfo("Testing to get last entry with Label Filter");
@@ -295,7 +295,7 @@ class TEST_DAVSEValue {
 
         for ($i = 1; $i <= 10; $i++) {
             $entry = new be_vse_data();
-            $entry->device_id = 1;
+            $entry->app_id = 1;
             $entry->vse_label = "TEST FOR CLEARING_01";
             $entry->vse_value = $i . "OK";
             $entry->vse_type = "ANY";
@@ -306,7 +306,7 @@ class TEST_DAVSEValue {
 
         for ($i = 1; $i <= 10; $i++) {
             $entry = new be_vse_data();
-            $entry->device_id = 1;
+            $entry->app_id = 1;
             $entry->vse_label = "TEST FOR CLEARING_02";
             $entry->vse_value = $i . "OK";
             $entry->vse_type = "ANY";
@@ -331,7 +331,7 @@ class TEST_DAVSEValue {
         $check02 = da_vse_data::ClearEntries(1, 'TEST FOR CLEARING_01');
         print_r($check02);
         
-        ReportInfo("At this point all should be clear for device 1");
+        ReportInfo("At this point all should be clear for app 1");
         $allrecords = da_vse_data::GetEntries(1, '', 0);
         print_r($allrecords);           
         

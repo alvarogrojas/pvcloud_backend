@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Description of da_devices_registry
+ * Description of da_apps_registry
  *
  * @author janunezc
  */
-class be_device {
+class be_app {
 
-    public $device_id = 0;
+    public $app_id = 0;
     public $account_id = 0;
-    public $device_nickname = "";
-    public $device_description = "";
+    public $app_nickname = "";
+    public $app_description = "";
     public $api_key = "";
     public $created_datetime = NULL;
     public $modified_datetime = NULL;
@@ -19,15 +19,15 @@ class be_device {
 
 }
 
-class da_devices_registry {
+class da_apps_registry {
 
     /**
-     * Registers a device and returns the resultant record as be_device
-     * @param be_device $device
+     * Registers a app and returns the resultant record as be_app
+     * @param be_app $app
      * @return type
      */
-    public static function RegisterNewDevice($device) {
-        $sqlCommand = "INSERT INTO device_registry (account_id,device_nickname,device_description,api_key, created_datetime)"
+    public static function RegisterNewApp($app) {
+        $sqlCommand = "INSERT INTO app_registry (account_id,app_nickname,app_description,api_key, created_datetime)"
                 . "VALUES (?,?,?,SHA1(UUID()), NOW())";
 
         $paramTypeSpec = "sss";
@@ -43,7 +43,7 @@ class da_devices_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $device->account_id, $device->device_nickname, $device->device_description)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -55,21 +55,21 @@ class da_devices_registry {
 
         $stmt->close();
 
-        $insertedDeviceID = $mysqli->insert_id;
+        $insertedAppID = $mysqli->insert_id;
 
-        $retrievedDevice = da_devices_registry::GetDevice($insertedDeviceID);
-        return $retrievedDevice;
+        $retrievedApp = da_apps_registry::GetApp($insertedAppID);
+        return $retrievedApp;
     }
 
     /**
-     * Returns a device found by its ID
-     * @param int $device_id
-     * @return be_device
+     * Returns a app found by its ID
+     * @param int $app_id
+     * @return be_app
      */
-    public static function GetDevice($device_id) {
+    public static function GetApp($app_id) {
         $sqlCommand = ""
-                . "SELECT   device_id,account_id,device_nickname,device_description,api_key,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime"
-                . " FROM device_registry WHERE device_id=? ";
+                . "SELECT   app_id,account_id,app_nickname,app_description,api_key,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime"
+                . " FROM app_registry WHERE app_id=? ";
 
         $mysqli = DA_Helper::mysqli_connect();
         if ($mysqli->connect_errno) {
@@ -82,7 +82,7 @@ class da_devices_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param("i", $device_id)) {
+        if (!$stmt->bind_param("i", $app_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -92,9 +92,9 @@ class da_devices_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        $result = new be_device();
+        $result = new be_app();
         $stmt->bind_result(
-                $result->device_id, $result->account_id, $result->device_nickname, $result->device_description, $result->api_key, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime, $result->last_connected_datetime
+                $result->app_id, $result->account_id, $result->app_nickname, $result->app_description, $result->api_key, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime, $result->last_connected_datetime
         );
 
         if (!$stmt->fetch()) {
@@ -107,13 +107,13 @@ class da_devices_registry {
     }
 
     /**
-     * Returns a list of devices for a given user account
+     * Returns a list of apps for a given user account
      * @param type $account_id
      * return Array
      */
-    public static function GetListOfDevices($account_id) {
-        $sqlCommand = "SELECT     device_id,account_id,device_nickname,device_description,api_key,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime "
-                . "FROM device_registry "
+    public static function GetListOfApps($account_id) {
+        $sqlCommand = "SELECT     app_id,account_id,app_nickname,app_description,api_key,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime "
+                . "FROM app_registry "
                 . "WHERE account_id = ? AND deleted_datetime IS NULL";
 
         $mysqli = DA_Helper::mysqli_connect();
@@ -133,14 +133,14 @@ class da_devices_registry {
             echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 
-        $deviceEntry = new be_device();
+        $appEntry = new be_app();
 
         $stmt->bind_result(
-                $deviceEntry->device_id, $deviceEntry->account_id, $deviceEntry->device_nickname, $deviceEntry->device_description, $deviceEntry->api_key, $deviceEntry->created_datetime, $deviceEntry->modified_datetime, $deviceEntry->deleted_datetime, $deviceEntry->last_connected_datetime);
+                $appEntry->app_id, $appEntry->account_id, $appEntry->app_nickname, $appEntry->app_description, $appEntry->api_key, $appEntry->created_datetime, $appEntry->modified_datetime, $appEntry->deleted_datetime, $appEntry->last_connected_datetime);
 
         $arrayResult = [];
         while ($stmt->fetch()) {
-            $arrayResult[] = json_decode(json_encode($deviceEntry));
+            $arrayResult[] = json_decode(json_encode($appEntry));
         }
 
         $stmt->close();
@@ -149,16 +149,16 @@ class da_devices_registry {
     }
 
     /**
-     * Updates a device with the provided information and returns the resulting record as saved.
-     * @param be_device $device
-     * @return be_device
+     * Updates a app with the provided information and returns the resulting record as saved.
+     * @param be_app $app
+     * @return be_app
      */
-    public static function UpdateDevice($device) {
-        $sqlCommand = "UPDATE device_registry "
+    public static function UpdateApp($app) {
+        $sqlCommand = "UPDATE app_registry "
                 . " SET  account_id = ?, "
-                . "     device_nickname = ?, "
-                . "     device_description = ? "
-                . " WHERE device_id = ? ";
+                . "     app_nickname = ?, "
+                . "     app_description = ? "
+                . " WHERE app_id = ? ";
 
         $paramTypeSpec = "issi";
 
@@ -173,7 +173,7 @@ class da_devices_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $device->account_id, $device->device_nickname, $device->device_description, $device->device_id)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description, $app->app_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -185,14 +185,14 @@ class da_devices_registry {
 
         $stmt->close();
 
-        $retrievedDevice = da_devices_registry::GetDevice($device->device_id);
-        return $retrievedDevice;
+        $retrievedApp = da_apps_registry::GetApp($app->app_id);
+        return $retrievedApp;
     }
 
-    public static function RegenerateApiKey($device_id) {
-        $sqlCommand = "UPDATE device_registry "
+    public static function RegenerateApiKey($app_id) {
+        $sqlCommand = "UPDATE app_registry "
                 . " SET  api_key = SHA1(UUID()) "
-                . " WHERE device_id = ? ";
+                . " WHERE app_id = ? ";
 
         $paramTypeSpec = "i";
 
@@ -207,7 +207,7 @@ class da_devices_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $device_id)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -219,19 +219,19 @@ class da_devices_registry {
 
         $stmt->close();
 
-        $retrievedDevice = da_devices_registry::GetDevice($device_id);
-        return $retrievedDevice;
+        $retrievedApp = da_apps_registry::GetApp($app_id);
+        return $retrievedApp;
     }
 
     /**
-     * Deletes a device by updating its deleted_datetime
-     * @param int $device_id
-     * @return be_device
+     * Deletes a app by updating its deleted_datetime
+     * @param int $app_id
+     * @return be_app
      */
-    public static function DeleteDevice($device_id) {
-        $sqlCommand = "UPDATE device_registry "
+    public static function DeleteApp($app_id) {
+        $sqlCommand = "UPDATE app_registry "
                 . " SET  deleted_datetime = NOW() "
-                . " WHERE device_id = ? ";
+                . " WHERE app_id = ? ";
 
         $paramTypeSpec = "i";
 
@@ -246,7 +246,7 @@ class da_devices_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $device_id)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -258,8 +258,8 @@ class da_devices_registry {
 
         $stmt->close();
 
-        $retrievedDevice = da_devices_registry::GetDevice($device_id);
-        return $retrievedDevice;
+        $retrievedApp = da_apps_registry::GetApp($app_id);
+        return $retrievedApp;
     }
 
 }

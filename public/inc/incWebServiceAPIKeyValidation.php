@@ -1,11 +1,11 @@
 <?php
 $account_id = filter_input(INPUT_GET, "account_id");
-$device_id  = filter_input(INPUT_GET, "device_id");
+$app_id  = filter_input(INPUT_GET, "app_id");
 $api_key = filter_input(INPUT_GET, "api_key");
 
-$device = da_devices_registry::GetDevice($device_id);
+$app = da_apps_registry::GetApp($app_id);
 
-$validation = $account_id==$device->account_id && $api_key == $device->api_key;
+$validation = $account_id==$app->account_id && $api_key == $app->api_key;
 
 if(! $validation) {
     die();

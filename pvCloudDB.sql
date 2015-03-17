@@ -52,35 +52,35 @@ INSERT INTO `accounts` (`account_id`, `email`, `nickname`, `pwd_hash`, `confirme
 -- --------------------------------------------------------
 
 --
--- Table structure for table `device_registry`
+-- Table structure for table `app_registry`
 --
 
-DROP TABLE IF EXISTS `device_registry`;
-CREATE TABLE IF NOT EXISTS `device_registry` (
-  `device_id` int(11) NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `app_registry`;
+CREATE TABLE IF NOT EXISTS `app_registry` (
+  `app_id` int(11) NOT NULL AUTO_INCREMENT,
   `account_id` int(11) NOT NULL,
-  `device_nickname` varchar(50) COLLATE utf8_bin NOT NULL,
-  `device_description` varchar(1000) COLLATE utf8_bin NOT NULL,
+  `app_nickname` varchar(50) COLLATE utf8_bin NOT NULL,
+  `app_description` varchar(1000) COLLATE utf8_bin NOT NULL,
   `api_key` varchar(200) COLLATE utf8_bin NOT NULL,
   `created_datetime` datetime NOT NULL,
   `modified_datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_datetime` datetime DEFAULT NULL,
   `last_connected_datetime` datetime DEFAULT NULL,
-  PRIMARY KEY (`device_id`),
-  KEY `device_nickname` (`device_nickname`),
+  PRIMARY KEY (`app_id`),
+  KEY `app_nickname` (`app_nickname`),
   KEY `account_id` (`account_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=4 ;
 
 --
--- Truncate table before insert `device_registry`
+-- Truncate table before insert `app_registry`
 --
 
-TRUNCATE TABLE `device_registry`;
+TRUNCATE TABLE `app_registry`;
 --
--- Dumping data for table `device_registry`
+-- Dumping data for table `app_registry`
 --
 
-INSERT INTO `device_registry` (`device_id`, `account_id`, `device_nickname`, `device_description`, `api_key`, `created_datetime`, `modified_datetime`, `deleted_datetime`, `last_connected_datetime`) VALUES
+INSERT INTO `app_registry` (`app_id`, `account_id`, `app_nickname`, `app_description`, `api_key`, `created_datetime`, `modified_datetime`, `deleted_datetime`, `last_connected_datetime`) VALUES
 (1, 1, 'JOSE''S FIRST GALILEO GEN 1', 'FIRST GALILEO GEN 1 I HAD', 'c55452a9bdacdc0dc15919cdfe8d8f7d4c05ac5e', '2014-12-06 16:04:21', '2014-12-17 05:57:10', NULL, NULL),
 (2, 1, 'ALARMA LSM PR01', 'Laser Tripwire Alarm', '32c50daa34760183d9ec217ed775c60d155ac81c', '2014-12-16 23:56:35', '2014-12-17 06:00:58', NULL, NULL),
 (3, 1, 'WATER GRAY SYSTEM', 'Aguas Jabonosas Distribuidor', '61d39e42ea3b1244fb12db616daac0d7ff88bfc4', '2014-12-16 23:58:46', '2014-12-17 05:58:46', NULL, NULL);
@@ -125,7 +125,7 @@ INSERT INTO `sessions` (`session_id`, `account_id`, `token`, `expiration_datetim
 DROP TABLE IF EXISTS `vse_data`;
 CREATE TABLE IF NOT EXISTS `vse_data` (
   `entry_id` int(11) NOT NULL AUTO_INCREMENT,
-  `device_id` int(11) NOT NULL,
+  `app_id` int(11) NOT NULL,
   `vse_label` varchar(50) COLLATE utf8_bin NOT NULL,
   `vse_value` varchar(200) COLLATE utf8_bin NOT NULL,
   `vse_type` varchar(50) COLLATE utf8_bin NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `vse_data` (
   `captured_datetime` datetime NOT NULL,
   `created_datetime` datetime NOT NULL,
   PRIMARY KEY (`entry_id`),
-  KEY `device_id` (`device_id`)
+  KEY `app_id` (`app_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=5530 ;
 
 --
@@ -145,5 +145,5 @@ TRUNCATE TABLE `vse_data`;
 -- Dumping data for table `vse_data`
 --
 
-INSERT INTO `vse_data` (`entry_id`, `device_id`, `vse_label`, `vse_value`, `vse_type`, `vse_annotations`, `captured_datetime`, `created_datetime`) VALUES
+INSERT INTO `vse_data` (`entry_id`, `app_id`, `vse_label`, `vse_value`, `vse_type`, `vse_annotations`, `captured_datetime`, `created_datetime`) VALUES
 (5522, 1, 'DIRECT pvCloud TEST', '12345', 'numerico', NULL, '2014-12-09 21:01:00', '2014-12-10 00:28:57');
