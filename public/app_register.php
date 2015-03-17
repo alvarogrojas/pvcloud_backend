@@ -44,7 +44,7 @@ function execute() {
                 $response->data = $app;
             } else {
                 $response->status = "ERROR";
-                $response->message = "Parámetro Inválido: Nombre de Dispositivo";
+                $response->message = "Parámetro Inválido: Nombre de App";
             }
         } else {
             $response->status = "ERROR";
