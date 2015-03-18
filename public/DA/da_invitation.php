@@ -25,7 +25,7 @@ class da_invitation {
         $token = sha1(uniqid() . $guest_email);
         
          $sqlCommand = "INSERT INTO invitations (host_email,guest_email,token,created_datetime, expired_datetime)"
-                . "VALUES (?,?,?,NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY))";
+                . "VALUES (?,?,?,NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY))";
          
          $paramTypeSpec = "sss";
          
