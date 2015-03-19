@@ -1,9 +1,9 @@
 <?php
 
-/*TEST: 
+/* TEST: 
  * https://localhost/pvcloud_backend/vse_get_csv.php?account_id=1&app_id=1&api_key=c55452a9bdacdc0dc15919cdfe8d8f7d4c05ac5e
  * https://localhost/pvcloud_backend/vse_get_csv.php?account_id=1&app_id=1&api_key=c55452a9bdacdc0dc15919cdfe8d8f7d4c05ac5e&value_label=TEST_01&count_limit=3
-*/
+ */
 error_reporting(E_ERROR);
 
 require_once './DA/da_conf.php';
@@ -78,29 +78,21 @@ class CSVWebService {
             $csvRow = "";
             $csvHeader = "";
 
-            foreach ($row as $fieldName => $property) {
+            foreach ($row as $propertyName => $propertyValue) {
                 if ($recordCount == 0) {
-                    $csvHeader.= '"' . $fieldName . '"' . ",";
+                    $csvHeader.= '"' . $propertyName . '"' . ","; //Ending comma of last property name must be removed later on...
                 }
 
-                $fixedProperty = str_replace("\"", "\"\"", $property);
-                $csvRow.= '"' . $fixedProperty . '"' . ",";
+                $sanitizedValue = CSVWebService::sanitizeDoubleQuotes($propertyValue);
+                $csvRow .= '"' . $sanitizedValue . '"' . ","; //Ending comma of last value in row must be removed later on...
             }
-
-            //IMPLODE METHOD WAS NOT USED IN ORDER TO ENABLE SANITIZATION OF DOUBLEQUOTES WITHIN PROPERTY VALUES.
-            //$csvRow.= "\"".implode("\",\"", get_object_vars($row))."\"".$newline;
 
             if ($recordCount == 0) {
-
-                //remove last comma on header
-                $lastCommaPosition = strlen($csvHeader) - 1;
-                $csvHeader = substr($csvHeader, 0, $lastCommaPosition) . $crlf;
-                $result.=$csvHeader;
+                $csvHeader = CSVWebService::removeEndingComma($csvHeader);
+                $result.=$csvHeader . $crlf;
             }
 
-            //remove last comma on row
-            $lastCommaPosition = strlen($csvRow) - 1;
-            $fixedCSVRow = substr($csvRow, 0, $lastCommaPosition);
+            $fixedCSVRow = CSVWebService::removeEndingComma($csvRow);
             $result .= $fixedCSVRow . $crlf;
 
             $recordCount ++;
@@ -109,29 +101,15 @@ class CSVWebService {
         return $result;
     }
 
-    //FUNCTION NOT USED... FEEL FREE TO REMOVE ON CODE CLEANUP
-    private static function arrayToCsv(array &$fields, $delimiter = ';', $enclosure = '"', $encloseAll = false, $nullToMysqlNull = false) {
-        $delimiter_esc = preg_quote($delimiter, '/');
-        $enclosure_esc = preg_quote($enclosure, '/');
-
-        $output = array();
-        foreach ($fields as $field) {
-            if ($field === null && $nullToMysqlNull) {
-                $output[] = 'NULL';
-                continue;
-            }
-
-            // Enclose fields containing $delimiter, $enclosure or whitespace
-            if ($encloseAll || preg_match("/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field)) {
-                $output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
-            } else {
-                $output[] = $field;
-            }
-        }
-
-        return implode($delimiter, $output);
+    private static function sanitizeDoubleQuotes($pieceOfData) {
+        return str_replace("\"", "\"\"", $pieceOfData);
     }
 
+    private static function removeEndingComma($row) {
+        $lastCommaPosition = strlen($row) - 1;
+        $fixedRow = substr($row, 0, $lastCommaPosition);
+        return $fixedRow;
+    } 
 }
 
 header("Content-type: text/csv");
