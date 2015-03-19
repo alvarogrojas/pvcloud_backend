@@ -8,8 +8,6 @@ error_reporting(E_ERROR);
 
 require_once './DA/da_conf.php';
 require_once './DA/da_helper.php';
-require_once './DA/da_account.php';
-require_once './DA/da_session.php';
 require_once './DA/da_apps_registry.php';
 require_once './DA/da_vse_data.php';
 
@@ -209,8 +207,5 @@ class CSVWebService {
 
 }
 
-header("Content-type: text/csv");
-header("Content-Disposition: attachment; filename=file.csv");
-header("Pragma: no-cache");
-header("Expires: 0");
+include './inc/incCSVHeaders.php';
 echo CSVWebService::GenerateCSV();
