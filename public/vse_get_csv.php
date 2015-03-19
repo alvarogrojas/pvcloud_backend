@@ -36,8 +36,6 @@ class CSVWebService {
 
             $entries = da_vse_data::GetEntries($parameters->app_id, $parameters->value_label, $parameters->count_limit);
 
-            //$csv = CSVWebService::arrayToCsv($entries);
-
             $csv = CSVWebService::generateCSVContent($entries);
 
             return $csv;
@@ -65,10 +63,10 @@ class CSVWebService {
     }
 
     /**
-     * Converts ana array of objects into a CSV string.
+     * Generates CSV Content out of data queried from pvCloud.
      * by @janunezc
-     * @param Array $entries
-     * @return string
+     * @param Array $entries The data to generate CSV from
+     * @return string Contains data in CSV format
      */
     private static function generateCSVContent($entries) {
         $isFirstRecord = true;
@@ -76,36 +74,22 @@ class CSVWebService {
         foreach ($entries as $row) {
             if ($isFirstRecord) {
                 $csvHeader = CSVWebService::resolveCSVHeader($row);
-                $result.= $csvHeader;
                 $isFirstRecord = false;
+                $result .= $csvHeader;
             }
 
             $csvRow = CSVWebService::resolveCSVRow($row);
-
             $result .= $csvRow;
         }
 
         return $result;
     }
 
-    private static function resolveCSVRow($row) {
-        $csvRow = "";
-        $valueAdditions = "";
-        foreach ($row as $propertyName => $propertyValue) {
-            $sanitizedValue = CSVWebService::sanitizeDoubleQuotes($propertyValue);
-            $csvRow .= '"' . $sanitizedValue . '"' . ",";
-
-            
-            if ($propertyName == "vse_value") {
-                $valueAdditions = CSVWebService::getValueAdditions($propertyValue);
-            }
-        }
-
-        $csvRow .= $valueAdditions;
-        $fixedCSVRow = CSVWebService::removeEndingComma($csvRow) . "\r\n";
-        return $fixedCSVRow;
-    }
-
+    /**
+     * Creates a CSV line with header names based on $row property names
+     * @param type $row
+     * @return string
+     */
     private static function resolveCSVHeader($row) {
         $columnAdditions = "";
         $csvHeader = "";
@@ -123,6 +107,29 @@ class CSVWebService {
         $csvHeaderWoEndingComma = CSVWebService::removeEndingComma($csvHeader) . "\r\n";
 
         return $csvHeaderWoEndingComma;
+    }
+    
+    /**
+     * Converts an array ($row) into a CSV string ended by CRLF
+     * @param type $row
+     * @return string CSV String
+     */
+    private static function resolveCSVRow($row) {
+        $csvRow = "";
+        $valueAdditions = "";
+        foreach ($row as $propertyName => $propertyValue) {
+            $sanitizedValue = CSVWebService::sanitizeDoubleQuotes($propertyValue);
+            $csvRow .= '"' . $sanitizedValue . '"' . ",";
+
+            
+            if ($propertyName == "vse_value") {
+                $valueAdditions = CSVWebService::getValueAdditions($propertyValue);
+            }
+        }
+
+        $csvRow .= $valueAdditions;
+        $fixedCSVRow = CSVWebService::removeEndingComma($csvRow) . "\r\n";
+        return $fixedCSVRow;
     }
 
     /**
@@ -142,6 +149,11 @@ class CSVWebService {
         return false;
     }
 
+    /**
+     * Resolves which columns have to be added for a given $value if it has a simple JSON object
+     * @param string $value
+     * @return string
+     */
     private static function getColumnAdditions($value) {
         $columnAdditions = "";
         $jsonDecoded = json_decode($value);
@@ -157,6 +169,11 @@ class CSVWebService {
         return $columnAdditions;
     }
 
+    /**
+     * resolves which values have to be added to CSV row if $value contains a JSON object.
+     * @param string $value
+     * @return string
+     */
     private static function getValueAdditions($value) {
         $valueAdditions = "";
         $jsonDecoded = json_decode($value);
@@ -170,10 +187,20 @@ class CSVWebService {
         return $valueAdditions;
     }
 
+    /**
+     * Looks for double quotes within csv values and duplicates them to be propery processed.
+     * @param string $pieceOfData
+     * @return string
+     */
     private static function sanitizeDoubleQuotes($pieceOfData) {
         return str_replace("\"", "\"\"", $pieceOfData);
     }
 
+    /**
+     * removes the expected ending comma on CSV row or CSV header being constructed
+     * @param type $row
+     * @return type
+     */
     private static function removeEndingComma($row) {
         $lastCommaPosition = strlen($row) - 1;
         $fixedRow = substr($row, 0, $lastCommaPosition);
