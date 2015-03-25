@@ -12,6 +12,7 @@ class be_app {
     public $app_nickname = "";
     public $app_description = "";
     public $api_key = "";
+    public $visibility_type_id = 0;
     public $created_datetime = NULL;
     public $modified_datetime = NULL;
     public $deleted_datetime = NULL;
@@ -27,10 +28,10 @@ class da_apps_registry {
      * @return type
      */
     public static function RegisterNewApp($app) {
-        $sqlCommand = "INSERT INTO app_registry (account_id,app_nickname,app_description,api_key, created_datetime)"
-                . "VALUES (?,?,?,SHA1(UUID()), NOW())";
+        $sqlCommand = "INSERT INTO app_registry (account_id,app_nickname,app_description,api_key, visibility_type_id, created_datetime)"
+                . "VALUES (?,?,?,SHA1(UUID()),?, NOW())";
 
-        $paramTypeSpec = "sss";
+        $paramTypeSpec = "sssi";
 
         $mysqli = DA_Helper::mysqli_connect();
         if ($mysqli->connect_errno) {
@@ -43,7 +44,7 @@ class da_apps_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname,$app->visibility_type_id ,$app->app_description)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -68,7 +69,7 @@ class da_apps_registry {
      */
     public static function GetApp($app_id) {
         $sqlCommand = ""
-                . "SELECT   app_id,account_id,app_nickname,app_description,api_key,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime"
+                . "SELECT   app_id,account_id,app_nickname,app_description,api_key,visibility_type_id,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime"
                 . " FROM app_registry WHERE app_id=? ";
 
         $mysqli = DA_Helper::mysqli_connect();
@@ -94,7 +95,7 @@ class da_apps_registry {
 
         $result = new be_app();
         $stmt->bind_result(
-                $result->app_id, $result->account_id, $result->app_nickname, $result->app_description, $result->api_key, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime, $result->last_connected_datetime
+                $result->app_id, $result->account_id, $result->app_nickname, $result->app_description, $result->api_key, $result->visibility_type_id, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime, $result->last_connected_datetime
         );
 
         if (!$stmt->fetch()) {
@@ -112,7 +113,7 @@ class da_apps_registry {
      * return Array
      */
     public static function GetListOfApps($account_id) {
-        $sqlCommand = "SELECT     app_id,account_id,app_nickname,app_description,api_key,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime "
+        $sqlCommand = "SELECT     app_id,account_id,app_nickname,app_description,api_key,visibility_type_id,created_datetime,modified_datetime,deleted_datetime,last_connected_datetime "
                 . "FROM app_registry "
                 . "WHERE account_id = ? AND deleted_datetime IS NULL";
 
@@ -136,7 +137,7 @@ class da_apps_registry {
         $appEntry = new be_app();
 
         $stmt->bind_result(
-                $appEntry->app_id, $appEntry->account_id, $appEntry->app_nickname, $appEntry->app_description, $appEntry->api_key, $appEntry->created_datetime, $appEntry->modified_datetime, $appEntry->deleted_datetime, $appEntry->last_connected_datetime);
+                $appEntry->app_id, $appEntry->account_id, $appEntry->app_nickname, $appEntry->app_description, $appEntry->api_key, $appEntry->visibility_type_id, $appEntry->created_datetime, $appEntry->modified_datetime, $appEntry->deleted_datetime, $appEntry->last_connected_datetime);
 
         $arrayResult = [];
         while ($stmt->fetch()) {
@@ -158,9 +159,10 @@ class da_apps_registry {
                 . " SET  account_id = ?, "
                 . "     app_nickname = ?, "
                 . "     app_description = ? "
+                . "     visibility_type_id = ?"
                 . " WHERE app_id = ? ";
 
-        $paramTypeSpec = "issi";
+        $paramTypeSpec = "issii";
 
         $mysqli = DA_Helper::mysqli_connect();
         if ($mysqli->connect_errno) {
@@ -173,7 +175,7 @@ class da_apps_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description, $app->app_id)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description,$app->visibility_type_id, $app->app_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
