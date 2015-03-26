@@ -32,22 +32,26 @@ function execute() {
         include './inc/incWebServiceSessionValidation.php';
 
         $app_id = filter_input(INPUT_GET, "app_id");
-        
+
         $appToModify = da_apps_registry::GetApp($app_id);
         $appToModify->account_id = filter_input(INPUT_GET, "account_id");
         $appToModify->app_nickname = filter_input(INPUT_GET, "app_nickname");
         $appToModify->app_description = filter_input(INPUT_GET, "app_description");
-        
-        if ($appToModify->account_id > 0 && $appToModify->app_nickname != "" && $appToModify->app_description != "") {
+        $appToModify->visibility_type_id = filter_input(INPUT_GET, "visibility_type_id");
+
+        if ($appToModify->account_id > 0 && $appToModify->app_nickname != "" && $appToModify->app_description != "" && $appToModify->visibility_type_id > 0 ) {
             $modifiedApp = da_apps_registry::UpdateApp($appToModify);
             $response->status = "OK";
             $response->message = "SUCCESS";
             $response->data = $modifiedApp;
         } else {
             $response->status = "ERROR";
-            if(! $appToModify->account_id>0) $response->message = "Parámetros Inválidos - AccountID";
-            if($appToModify->app_nickname == "") $response->message = "Parámetros Inválidos - Nickname";
-            if($appToModify->app_description == "") $response->message = "Parámetros Inválidos - Description";
+            if (!$appToModify->account_id > 0)
+                $response->message = "Parámetros Inválidos - AccountID";
+            if ($appToModify->app_nickname == "")
+                $response->message = "Parámetros Inválidos - Nickname";
+            if ($appToModify->app_description == "")
+                $response->message = "Parámetros Inválidos - Description";
         }
     } catch (Exception $ex) {
         $response->status = "EXCEPTION";

@@ -35,9 +35,10 @@ function execute() {
         $appToRegister->account_id = $account_id;
         $appToRegister->app_nickname = filter_input(INPUT_GET, "app_nickname");
         $appToRegister->app_description = filter_input(INPUT_GET, "app_description");
+        $appToRegister->visibility_type_id = filter_input(INPUT_GET, "visibility_type_id");
 
         if ($appToRegister->account_id > 0) {
-            if ($appToRegister->app_nickname !== "") {
+            if ($appToRegister->app_nickname != "") {
                 $app = da_apps_registry::RegisterNewApp($appToRegister);
                 $response->status = "OK";
                 $response->message = "SUCCESS";

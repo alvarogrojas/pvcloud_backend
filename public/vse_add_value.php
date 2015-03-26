@@ -19,7 +19,7 @@ require_once './DA/da_vse_data.php';
 function execute() {
     $registeredEntry = new be_vse_data();
     try {
-        include './inc/incWebServiceAPIKeyValidation.php'; 
+        include './inc/incWebServiceAPIKeyValidation.php';
 
         $entryToAdd = new be_vse_data;
         $entryToAdd->app_id = filter_input(INPUT_GET, "app_id");
@@ -28,8 +28,14 @@ function execute() {
         $entryToAdd->vse_type = filter_input(INPUT_GET, "type");
         $entryToAdd->vse_annotations = filter_input(INPUT_GET, "annotations");
         $entryToAdd->captured_datetime = filter_input(INPUT_GET, "captured_datetime");
-       
-        if(validate($entryToAdd)){
+
+        if (!isset($entryToAdd->captured_datetime) || $entryToAdd->captured_datetime =='') {
+            $dateX = new DateTime();
+            
+            $entryToAdd->captured_datetime = $dateX->format("Y-m-d H:i:s.u");
+        }
+
+        if (validate($entryToAdd)) {
             $registeredEntry = da_vse_data::AddEntry($entryToAdd);
         } else {
             die("Parámetros Inválidos");
@@ -40,19 +46,19 @@ function execute() {
     return $registeredEntry;
 }
 
-function validate($entry){
-        $capturedDateTime = date_parse($entry->captured_datetime);
+function validate($entry) {
+    $capturedDateTime = date_parse($entry->captured_datetime);
+    $capturedDateTimeIsValid = false;
+    if ($capturedDateTime["error_count"] == 0 && checkdate($capturedDateTime["month"], $capturedDateTime["day"], $capturedDateTime["year"])) {
+        $capturedDateTimeIsValid = true;
+    } else {
         $capturedDateTimeIsValid = false;
-        if ($capturedDateTime["error_count"] == 0 && checkdate($capturedDateTime["month"], $capturedDateTime["day"], $capturedDateTime["year"])) {
-            $capturedDateTimeIsValid = true;
-        } else {
-            $capturedDateTimeIsValid = false;
-        }
-        
-        if ($entry->app_id > 0 && $capturedDateTimeIsValid==true) {
-            return true;
-        }
-        return false;
+    }
+
+    if ($entry->app_id > 0 && $capturedDateTimeIsValid == true) {
+        return true;
+    }
+    return false;
 }
 
 include './inc/incJSONHeaders.php';
