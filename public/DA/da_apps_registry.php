@@ -20,6 +20,16 @@ class be_app {
 
 }
 
+class be_page {
+    public $page_id = 0;
+    public $app_id= 0;
+    public $title = "";
+    public $description = "";
+    public $visibility_type_id = 0;
+    public $created_datetime = NULL;
+    public $modified_datetime = NULL;
+}
+
 class da_apps_registry {
 
     /**
@@ -44,7 +54,7 @@ class da_apps_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname,$app->app_description,$app->visibility_type_id)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description, $app->visibility_type_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -150,6 +160,49 @@ class da_apps_registry {
     }
 
     /**
+     * Returns a list of UNDELETED pages for a given app_id
+     * @param int $app_id
+     * @return Array
+     */
+
+    public static function GetListOfPages($app_id) {
+        $sqlCommand = "SELECT  page_id,app_id, title, description, visibility_type_id, created_datetime, modified_datetime "
+                . "FROM pages "
+                . "WHERE app_id = ? AND deleted_datetime IS NULL";
+
+        $mysqli = DA_Helper::mysqli_connect();
+        if ($mysqli->connect_errno) {
+            echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+        }
+
+        if (!($stmt = $mysqli->prepare($sqlCommand))) {
+            echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+        }
+
+        if (!$stmt->bind_param("i", $app_id)) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        $pageEntry = new be_page();
+
+        $stmt->bind_result(
+                $pageEntry->page_id, $pageEntry->app_id, $pageEntry->title, $pageEntry->description, $pageEntry->visibility_type_id, $pageEntry->created_datetime, $pageEntry->modified_datetime);
+
+        $arrayResult = [];
+        while ($stmt->fetch()) {
+            $arrayResult[] = json_decode(json_encode($pageEntry));
+        }
+
+        $stmt->close();
+
+        return $arrayResult;
+    }
+
+    /**
      * Updates a app with the provided information and returns the resulting record as saved.
      * @param be_app $app
      * @return be_app
@@ -163,7 +216,7 @@ class da_apps_registry {
                 . " WHERE app_id = ? ";
 
         $paramTypeSpec = "issii";
-        
+
         $mysqli = DA_Helper::mysqli_connect();
         if ($mysqli->connect_errno) {
             $msg = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
@@ -175,7 +228,7 @@ class da_apps_registry {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description,$app->visibility_type_id, $app->app_id)) {
+        if (!$stmt->bind_param($paramTypeSpec, $app->account_id, $app->app_nickname, $app->app_description, $app->visibility_type_id, $app->app_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
@@ -191,6 +244,12 @@ class da_apps_registry {
         return $retrievedApp;
     }
 
+    /**
+     * Regenerates the API KEY of an app
+     * @param int $app_id
+     * @return be_app
+     * @throws Exception
+     */
     public static function RegenerateApiKey($app_id) {
         $sqlCommand = "UPDATE app_registry "
                 . " SET  api_key = SHA1(UUID()) "
