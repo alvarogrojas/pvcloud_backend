@@ -26,6 +26,7 @@ class CSVWebService {
         try {
             $app_id = 0; //THIS WILL BE OVERRIDEN BY THE INCLUDE 
             $account_id = 0; //THIS WILL BE OVERRIDEN BY THE INCLUDE 
+            $access = "RO";  
             include './inc/incWebServiceAPIKeyValidation.php';
 
             $parameters = CSVWebService::collectParameters();

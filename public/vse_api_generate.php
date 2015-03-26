@@ -48,6 +48,7 @@ function getBaseURL($forceHTTPS) {
 
 function execute() {
     try {
+        $access = "RW"; 
         include './inc/incWebServiceAPIKeyValidation.php';
 
         $parameters = collectParameters();

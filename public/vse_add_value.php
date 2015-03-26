@@ -19,6 +19,7 @@ require_once './DA/da_vse_data.php';
 function execute() {
     $registeredEntry = new be_vse_data();
     try {
+        $access = "RW";  
         include './inc/incWebServiceAPIKeyValidation.php';
 
         $entryToAdd = new be_vse_data;
