@@ -1,5 +1,6 @@
 <?php
-//error_reporting(E_ERROR);
+error_reporting(E_ERROR);
+
 require_once './DA/da_conf.php';
 require_once './DA/da_helper.php';
 require_once './DA/da_account.php';
