@@ -24,61 +24,71 @@ include './inc/incWebServiceSessionValidation.php';
 
 class PageModifyWebService {
 
-    public static function ModifyPage($page) {
+    public static function ModifyPage() {
+
         $response = new simpleResponse();
-        $parameters = PageModifyWebService::collectParameters();
-        $pageToModify = da_apps_registry::GetPage($parameters->$page_id);
-        $pageToModify->title = $parameters->title;
-        $pageToModify->description = $parameters->description;
-        $pageToModify->visibility_type_id = $parameters->visibility_type_id;
-               
+        try {
+            $parameters = PageModifyWebService::collectParameters();
+            $parametersErrors = PageModifyWebService::validateParameters($parameters);
+
+            if (count($parametersErrors) == 0) {
+                $savedPage = PageModifyWebService::savePage($parameters);
+                if ($savedPage->page_id == $parameters->page_id) {
+                    $response->message = "Página guardada satisfactoriamente";
+                    $response->status = "OK";
+                    $response->data = $savedPage;
+                }
+            } else {
+                $response->message = "Parámetros Inválidos";
+                $response->status = "ERROR";
+                $response->data = $parametersErrors;
+            }
+        } catch (Exception $ex) {
+            $response->message = $ex->getMessage();
+            $response->status = "EXCEPTION";
+            $response->data = NULL;
+        }
+        
+        return $response;
     }
 
     private static function collectParameters() {
-        
+        $parameters = new stdClass();
+        $parameters->page_id = filter_input(INPUT_GET, "page_id");
+        $parameters->title = filter_input(INPUT_GET, "title");
+        $parameters->description = filter_input(INPUT_GET, "description");
+        $parameters->visibility_type_id = filter_input(INPUT_GET, "visibility_type_id");
+        return $parameters;
     }
 
-}
+    private static function validateParameters($parameters) {
+        $errorsFound = [];
 
-/**
- * 
- * 
- * @return \simpleResponse
- */
-function execute() {
-
-    try {
-
-        include './inc/incWebServiceSessionValidation.php';
-
-        $app_id = filter_input(INPUT_GET, "app_id");
-
-        $appToModify = da_apps_registry::GetApp($app_id);
-        $appToModify->account_id = filter_input(INPUT_GET, "account_id");
-        $appToModify->app_nickname = filter_input(INPUT_GET, "app_nickname");
-        $appToModify->app_description = filter_input(INPUT_GET, "app_description");
-        $appToModify->visibility_type_id = filter_input(INPUT_GET, "visibility_type_id");
-
-        if ($appToModify->account_id > 0 && $appToModify->app_nickname != "" && $appToModify->app_description != "" && $appToModify->visibility_type_id > 0) {
-            $modifiedApp = da_apps_registry::UpdateApp($appToModify);
-            $response->status = "OK";
-            $response->message = "SUCCESS";
-            $response->data = $modifiedApp;
-        } else {
-            $response->status = "ERROR";
-            if (!$appToModify->account_id > 0)
-                $response->message = "Parámetros Inválidos - AccountID";
-            if ($appToModify->app_nickname == "")
-                $response->message = "Parámetros Inválidos - Nickname";
-            if ($appToModify->app_description == "")
-                $response->message = "Parámetros Inválidos - Description";
+        if (!is_numeric($parameters->page_id) || !$parameters->page_id > 0) {
+            $errorsFound[] = "ID de la página es inválido.";
         }
-    } catch (Exception $ex) {
-        $response->status = "EXCEPTION";
-        $response->message = $ex->getMessage();
+
+        if (!is_string($parameters->title) || $parameters->title == "") {
+            $errorsFound[] = "Título de la página es inválido.";
+        }
+
+        if (!is_string($parameters->description) || $parameters->description == "") {
+            $errorsFound[] = "Descripción de la página es inválido.";
+        }
+
+        if (!is_numeric($parameters->visibility_type_id) || !($parameters->visibility_type_id >= 1 && $parameters->visibility_type_id <= 3)) {
+            $errorsFound[] = "Visibilidad de la página es inválido.";
+        }
+
+        return $errorsFound;
     }
-    return $response;
+
+    private static function savePage($parameters) {
+        return da_apps_registry::UpdatePage($parameters);
+    }
+
 }
+
 
 include './inc/incJSONHeaders.php';
-echo json_encode(execute());
+echo json_encode(PageModifyWebService::ModifyPage());
