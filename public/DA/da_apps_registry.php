@@ -335,8 +335,8 @@ class da_apps_registry {
      * @return type
      */
     public static function RegisterNewPage($page) {
-        $sqlCommand = "INSERT INTO pages (app_id, title, description, visibility_type_id)"
-                . "VALUES (?,?,?,?)";
+        $sqlCommand = "INSERT INTO pages (app_id, title, description, visibility_type_id, created_datetime)"
+                . "VALUES (?,?,?,?, NOW())";
 
         $paramTypeSpec = "issi";
 
