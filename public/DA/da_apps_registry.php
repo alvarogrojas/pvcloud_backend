@@ -29,7 +29,7 @@ class be_page {
     public $visibility_type_id = 0;
     public $created_datetime = NULL;
     public $modified_datetime = NULL;
-
+    public $deleted_datetime = NULL;
 }
 
 class da_apps_registry {
@@ -210,7 +210,7 @@ class da_apps_registry {
      */
     public static function GetPage($page_id) {
         $sqlCommand = ""
-                . "SELECT page_id, app_id, title, description, visibility_type_id, created_datetime, modified_datetime "
+                . "SELECT page_id, app_id, title, description, visibility_type_id, created_datetime, modified_datetime, deleted_datetime "
                 . " FROM pages WHERE page_id=? ";
 
         $mysqli = DA_Helper::mysqli_connect();
@@ -236,7 +236,7 @@ class da_apps_registry {
 
         $result = new be_page();
         $stmt->bind_result(
-                $result->page_id, $result->app_id, $result->title, $result->description, $result->visibility_type_id, $result->created_datetime, $result->modified_datetime
+                $result->page_id, $result->app_id, $result->title, $result->description, $result->visibility_type_id, $result->created_datetime, $result->modified_datetime, $result->deleted_datetime
         );
 
         if (!$stmt->fetch()) {
@@ -287,7 +287,87 @@ class da_apps_registry {
 
         $retrievedPage = da_apps_registry::GetPage($page->page_id);
         return $retrievedPage;
-    }    
+    } 
+    
+    /**
+     * Updates a app with the provided information and returns the resulting record as saved.
+     * @param be_app $page
+     * @return be_app
+     */
+    public static function DeletePage($page_id) {
+        $sqlCommand = "UPDATE pages "
+                . " SET  deleted_datetime = NOW() "
+                . " WHERE page_id = ? ";
+
+        $paramTypeSpec = "i";
+
+        $mysqli = DA_Helper::mysqli_connect();
+        if ($mysqli->connect_errno) {
+            $msg = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+            throw new Exception($msg, $mysqli->connect_errno);
+        }
+
+        if (!($stmt = $mysqli->prepare($sqlCommand))) {
+            $msg = "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->bind_param($paramTypeSpec, $page_id)) {
+            $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->execute()) {
+            $msg = "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        $stmt->close();
+
+        $retrievedPage = da_apps_registry::GetPage($page_id);
+        
+        return $retrievedPage;
+    }     
+    
+    /**
+     * Registers a app and returns the resultant record as be_app
+     * @param be_app $page
+     * @return type
+     */
+    public static function RegisterNewPage($page) {
+        $sqlCommand = "INSERT INTO pages (app_id, title, description, visibility_type_id)"
+                . "VALUES (?,?,?,?)";
+
+        $paramTypeSpec = "issi";
+
+        $mysqli = DA_Helper::mysqli_connect();
+        if ($mysqli->connect_errno) {
+            $msg = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+            throw new Exception($msg, $mysqli->connect_errno);
+        }
+
+        if (!($stmt = $mysqli->prepare($sqlCommand))) {
+            $msg = "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->bind_param($paramTypeSpec,$page->app_id, $page->title, $page->description, $page->visibility_type_id)) {
+            $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->execute()) {
+            $msg = "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        $stmt->close();
+
+        $insertedPageID = $mysqli->insert_id;
+
+        $retrievedPage = da_apps_registry::GetPage($insertedPageID);
+        return $retrievedPage;
+    }
 
     /**
      * Updates a app with the provided information and returns the resulting record as saved.
