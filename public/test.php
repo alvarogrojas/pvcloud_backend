@@ -339,6 +339,19 @@ class TEST_DAVSEValue {
 
 }
 
+class TEST_DAInvitation {
+
+    public static function test_da_invitation() {
+        ReportInfo("Initiating Invitation Test");
+        ReportInfo("creating invitation for robertoviquez@gmail.com");
+        $invitation = da_invitation::AddNewInvitation("roberto.viquez@intel.com", "robertoviquez@gmail.com");
+        print_r($invitation);        
+        
+        ReportInfo("Invitation Tests Complete!");
+    }
+
+}
+
 function test_da_account() {
     $createdAccount = da_account::AddNewAccount("roberto.viquez@intel.com", "neo", sha1("sion"));
     if ($createdAccount == NULL) {
