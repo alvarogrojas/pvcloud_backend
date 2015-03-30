@@ -18,6 +18,7 @@ require_once './DA/da_vse_data.php';
 function execute() {
     $entries = new be_vse_data();
     try {
+        $access = "RO";  
         include './inc/incWebServiceAPIKeyValidation.php';
 
         $parameters = collectParameters();

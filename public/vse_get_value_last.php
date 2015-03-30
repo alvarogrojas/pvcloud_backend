@@ -21,6 +21,7 @@ include_once './inc/incBaseURL.php';
 function execute() {
     $entries = new be_vse_data();
     try {
+        $access = "RO";  
         include './inc/incWebServiceAPIKeyValidation.php';
 
         $parameters = collectParameters();

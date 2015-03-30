@@ -1,5 +1,6 @@
 <?php
-//error_reporting(E_ERROR);
+error_reporting(E_ERROR);
+
 require_once './DA/da_conf.php';
 require_once './DA/da_helper.php';
 require_once './DA/da_account.php';
@@ -48,6 +49,7 @@ function getBaseURL($forceHTTPS) {
 
 function execute() {
     try {
+        $access = "RW"; 
         include './inc/incWebServiceAPIKeyValidation.php';
 
         $parameters = collectParameters();
