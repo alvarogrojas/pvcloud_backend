@@ -67,7 +67,7 @@ class da_session {
 
     public static function GetAndValidateSession($account_id, $token) {
         $session = da_session::getValidSession($account_id, $token);
-
+        
         if ($session->account_id == $account_id && $session->token == $token) {
             $result = da_session::refreshSessionExpirationDatetime($account_id, $token);
         }
