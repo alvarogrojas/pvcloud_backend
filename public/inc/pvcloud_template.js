@@ -26,6 +26,9 @@ var pvCloudModule = function (app_id, api_key, account_id, baseURL) {
             case "get_last_value":
                 pvCloud_GetLastValue(parameters.value_label);
                 break;
+            case "get_last_value_simple":
+                pvCloud_GetLastValue_Simple(parameters.value_label);
+                break;                
             case "get_values":
                 pvCloud_GetValues(parameters.value_label, parameters.last_limit);
                 break;
@@ -82,6 +85,10 @@ var pvCloudModule = function (app_id, api_key, account_id, baseURL) {
                 if (parameters.value_label === undefined)
                     parameters.value_label = "";
                 break;
+            case "get_last_value_simple":
+                if (parameters.value_label === undefined)
+                    parameters.value_label = "";
+                break;                
             case "get_values":
                 if (parameters.value_label === undefined)
                     parameters.value_label = "";
@@ -177,6 +184,30 @@ var pvCloudModule = function (app_id, api_key, account_id, baseURL) {
             }
         });
     }
+    
+    function pvCloud_GetLastValue_Simple(value_label, callback) {
+        var wsURL = baseURL;
+        wsURL += "vse_get_value_last.php";
+        wsURL += '?app_id=' + app_id;
+        wsURL += '&api_key=' + api_key;
+        wsURL += '&account_id=' + account_id;
+
+        wsURL += '&optional_label=' + value_label;
+
+        request(wsURL, function (error, response, body) {
+
+            if (!error && response.statusCode === 200) {
+                console.log(JSON.parse(body).vse_value);
+            } else {
+                console.log(response);
+                console.log(error);
+            }
+            if (callback) {
+                callback(error, response, body);
+            }
+        });
+    }    
+    
 
     function pvCloud_GetValues(value_label, last_limit, callback) {
         var wsURL = baseURL;
