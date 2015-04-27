@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `invitations` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ALTER TABLE `invitations`
- ADD PRIMARY KEY (`invitation_id`), ADD UNIQUE KEY `host_email` (`host_email`,`guest_email`);
+ ADD PRIMARY KEY (`invitation_id`);
 
 ALTER TABLE `invitations`
 MODIFY `invitation_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;

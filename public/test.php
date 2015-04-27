@@ -5,6 +5,7 @@ require_once './DA/da_account.php';
 require_once './DA/da_session.php';
 require_once './DA/da_apps_registry.php';
 require_once './DA/da_vse_data.php';
+require_once './DA/da_invitation.php';
 ?>
 <!DOCTYPE html>
 <html>
@@ -16,11 +17,13 @@ require_once './DA/da_vse_data.php';
         <?php
         ReportInfo("Initiating Tests!");
 
-        TEST_DASession::test_da_session();
+        //TEST_DASession::test_da_session();
         
         //TEST_DAApp::test_da_app();
 
         //TEST_DAVSEValue::Test();
+        
+        TEST_DAInvitation::test_da_invitation();
 
         ReportInfo("Tests Finished!");
         ?> 
@@ -207,7 +210,8 @@ class TEST_DAVSEValue {
 
         TEST_DAVSEValue::testGetLastEntry();
 
-        TEST_DAVSEValue::testClearEntries($uuid);
+        TEST_DAVSEValue::testClearEntries($uuid);        
+        
     }
 
     private static function testAddEntries($uuid) {
@@ -345,7 +349,7 @@ class TEST_DAInvitation {
         ReportInfo("Initiating Invitation Test");
         ReportInfo("creating invitation for robertoviquez@gmail.com");
         $invitation = da_invitation::AddNewInvitation("roberto.viquez@intel.com", "robertoviquez@gmail.com");
-        print_r($invitation);        
+        ReportInfo("El resultado de la creacion de la invitacion: ".print_r($invitation, true));    
         
         ReportInfo("Invitation Tests Complete!");
     }

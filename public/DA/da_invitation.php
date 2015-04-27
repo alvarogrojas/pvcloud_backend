@@ -52,17 +52,19 @@ class da_invitation {
 
         $stmt->close();
         
-        $retrievedInvitation = da_invitation::GetInvitation($host_email, $guest_email, $token);
+        $insertedID = $mysqli->insert_id;
+        
+        $retrievedInvitation = da_invitation::GetInvitationByID($insertedID);
             return $retrievedInvitation;
     }
     
-     public static function GetInvitation($host_email, $guest_email, $token) {
+     public static function GetInvitation($guest_email, $token) {
          
         $sqlCommand = "SELECT invitation_id,host_email,guest_email,token, created_datetime, expired_datetime"
                 . " FROM invitations "
-                . " WHERE host_email=? AND guest_email = ? AND  token = ?";
+                . " WHERE guest_email = ? AND token =?";
         
-        $paramTypeSpec = "sss";
+        $paramTypeSpec = "ss";
 
         $mysqli = DA_Helper::mysqli_connect();
         if ($mysqli->connect_errno) {
@@ -75,7 +77,48 @@ class da_invitation {
             throw new Exception($msg, $stmt->errno);
         }
 
-        if (!$stmt->bind_param($paramTypeSpec, $host_email, $guest_email, $token)) {
+        if (!$stmt->bind_param($paramTypeSpec, $guest_email, $token)) {
+            $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->execute()) {
+            $msg = "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        $result = new be_invitation();
+        $stmt->bind_result($result->invitation_id, $result->host_email, $result->guest_email, $result->token, $result->created_datetime, $result->expired_datetime);
+
+        if (!$stmt->fetch()) {
+            $result = NULL;
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+    
+    public static function GetInvitationByID($invitation_id) {
+         
+        $sqlCommand = "SELECT invitation_id,host_email,guest_email,token, created_datetime, expired_datetime"
+                . " FROM invitations "
+                . " WHERE invitation_id=?";
+        
+        $paramTypeSpec = "i";
+
+        $mysqli = DA_Helper::mysqli_connect();
+        if ($mysqli->connect_errno) {
+            $msg = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!($stmt = $mysqli->prepare($sqlCommand))) {
+            $msg = "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            throw new Exception($msg, $stmt->errno);
+        }
+
+        if (!$stmt->bind_param($paramTypeSpec, $invitation_id)) {
             $msg = "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
             throw new Exception($msg, $stmt->errno);
         }
